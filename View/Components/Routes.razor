@@ -1,0 +1,11 @@
+<Router AppAssembly="typeof(Program).Assembly">
+    <Found Context="routeData">
+        <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
+        <FocusOnNavigate RouteData="routeData" Selector="h1" />
+    </Found>
+    <NotFound>
+        <LayoutView Layout="typeof(Layout.MainLayout)">
+            <section class="container py-5"><h1>העמוד לא נמצא</h1><a class="btn btn-primary" href="/">בחזרה לדף הבית</a></section>
+        </LayoutView>
+    </NotFound>
+</Router>

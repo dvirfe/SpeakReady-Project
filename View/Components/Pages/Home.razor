@@ -1,0 +1,84 @@
+@page "/"
+<PageTitle>SpeakReady | מדברים אנגלית בביטחון</PageTitle>
+
+<section class="hero-section">
+    <div class="container">
+        <div class="row g-5 align-items-center">
+            <div class="col-lg-7 hero-copy">
+                <span class="eyebrow"><span class="status-dot"></span> הדרך שלכם לבגרות בעל פה · 5 יחידות</span>
+                <h1>יש לכם מה לומר.<br /><span class="highlight-word">בואו נגיד את זה</span><br />באנגלית.</h1>
+                <p class="lead mt-4">מסלול שיעורים, תרגול דיבור ומשוב אישי.<br class="d-none d-md-block" /> בקצב שלכם, עם מקום לנסות שוב ולהשתפר.</p>
+                <div class="d-flex flex-wrap gap-3 mt-4">
+                    <a class="btn btn-primary btn-lg" href="/register">מתחילים כאן <span aria-hidden="true">←</span></a>
+                    <a class="btn btn-outline-primary btn-lg" href="#lesson-example">מציצים לתרגול</a>
+                </div>
+                <div class="hero-points mt-4 d-flex flex-wrap gap-3">
+                    <span>✓ למידה עצמאית</span><span>✓ מסלול מדורג</span><span>✓ אפשרות לליווי מורה</span>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="practice-preview">
+                    <div class="d-flex justify-content-between align-items-center mb-4"><span class="preview-label">A LITTLE PRACTICE. A BIG DIFFERENCE.</span><span class="preview-dot"></span></div>
+                    <div class="d-flex justify-content-between align-items-center"><span class="badge lesson-badge">תרגול לדוגמה</span><span class="small preview-muted">01 / SPEAK UP</span></div>
+                    <h2 class="preview-question mt-4" dir="ltr" lang="en">What is something<br />you enjoy doing<br /><em>and why?</em></h2>
+                    <div class="waveform" aria-hidden="true">
+                        @for (int i = 0; i < 31; i++) { <span style="height:@(16 + ((i * 19 + 7) % 55))px"></span> }
+                    </div>
+                    <div class="preview-bottom d-flex align-items-center gap-3">
+                        <img src="@Assets["images/microphone.svg"]" alt="" width="46" height="46" />
+                        <div><strong>כל ניסיון הוא צעד קדימה</strong><p class="mb-0 small preview-muted">חושבים. מדברים. לומדים.</p></div>
+                    </div>
+                    <div class="preview-note"><span class="note-icon" aria-hidden="true">✦</span> לא צריך תשובה מושלמת.<br /><strong>צריך להתחיל לדבר.</strong></div>
+                </div>
+                <p class="small text-secondary mt-3 text-center">המחשה של חוויית התרגול המתוכננת</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="value-strip" aria-label="יתרונות המערכת">
+    <div class="container row-gap-3 d-flex flex-wrap justify-content-between gap-4">
+        <span><b>01</b> מסלול למידה ברור</span><span><b>02</b> מקום לקול האישי שלכם</span><span><b>03</b> למידה מכל ניסיון</span>
+    </div>
+</section>
+
+<section class="section-space" id="how-it-works">
+    <div class="container">
+        <div class="section-heading"><span class="eyebrow">משאלה לתשובה, צעד אחר צעד</span><h2>כך נבנה הביטחון שלכם.</h2><p>מסלול שמחבר בין הבנה, תרגול ושיפור.</p></div>
+        <div class="row g-4">
+            <div class="col-md-4"><article class="feature-card h-100"><span class="step-number">01</span><h3>לומדים איך לענות</h3><p>הסברים ודוגמאות שיעזרו לבנות תשובה ברורה, להוסיף נימוק ולבחור את המילים.</p><span class="card-keyword">LEARN</span></article></div>
+            <div class="col-md-4"><article class="feature-card h-100"><span class="step-number">02</span><h3>נותנים לקול מקום</h3><p>מתרגלים תשובה לשאלה ממוקדת. בגרסה המלאה תוכלו להקליט, להאזין ולנסות שוב.</p><span class="card-keyword">SPEAK</span></article></div>
+            <div class="col-md-4"><article class="feature-card h-100"><span class="step-number">03</span><h3>לומדים מכל ניסיון</h3><p>משוב אישי והיסטוריית תרגול מתוכננים לעזור לזהות מה עובד ומה כדאי לשפר.</p><span class="card-keyword">GROW</span></article></div>
+        </div>
+    </div>
+</section>
+
+<section class="path-section section-space" id="learning-path">
+    <div class="container"><div class="row g-5 align-items-center">
+        <div class="col-lg-5"><span class="eyebrow">לאט, ברור ובקצב שלכם</span><h2>משפט ראשון.<br />תשובה מלאה.<br /><span class="text-accent">הקול שלכם.</span></h2><p class="mt-4">לומדים איך להרחיב תשובה, להביע דעה ולהוסיף דוגמה אישית. התוכן מיועד לתלמידי 5 יחידות המתכוננים לבגרות בעל פה.</p></div>
+        <div class="col-lg-7"><div class="path-list">
+            <div class="path-item"><span class="path-index">01</span><div><h3>מתחילים לדבר על עצמנו</h3><p>תחביבים, חוויות ודברים שחשובים לנו.</p></div><span class="path-arrow" aria-hidden="true">↗</span></div>
+            <div class="path-item"><span class="path-index">02</span><div><h3>בונים תשובה עם עומק</h3><p>רעיון מרכזי, נימוק ודוגמה.</p></div><span class="path-arrow" aria-hidden="true">↗</span></div>
+            <div class="path-item"><span class="path-index">03</span><div><h3>מביעים דעה בביטחון</h3><p>מחברים בין רעיונות ושומרים על רצף.</p></div><span class="path-arrow" aria-hidden="true">↗</span></div>
+        </div><p class="small text-secondary mt-3">נושאים לדוגמה מתוך מסלול הלמידה המתוכנן.</p></div>
+    </div></div>
+</section>
+
+<section class="section-space" id="lesson-example">
+    <div class="container"><div class="row g-5 align-items-center">
+        <div class="col-lg-5"><span class="eyebrow">טועמים מהדרך</span><h2>תשובה טובה<br />מתחילה ברעיון קטן.</h2><p>בחרו תחביב. אמרו מה אתם אוהבים בו, והוסיפו דוגמה. נסו לקרוא את התשובה בקול ולנסח אחר כך גרסה משלכם.</p></div>
+        <div class="col-lg-7"><article class="example-card">
+            <span class="badge text-bg-light mb-3">שיעור לדוגמה · נימוק ודוגמה</span>
+            <h3 lang="en" dir="ltr">What do you enjoy doing in your free time?</h3>
+            <blockquote lang="en" dir="ltr">“I enjoy playing football because it helps me relax. For example, I play with my friends after school, and we always have a good time.”</blockquote>
+            <div class="d-flex flex-wrap gap-2"><span class="example-tag">רעיון: לשחק כדורגל</span><span class="example-tag">נימוק: להירגע</span><span class="example-tag">דוגמה: עם חברים אחרי הלימודים</span></div>
+        </article></div>
+    </div></div>
+</section>
+
+<section class="teacher-section" id="teachers">
+    <div class="container py-5"><div class="row g-4 align-items-center">
+        <div class="col-lg-8"><span class="eyebrow">גם ביחד, גם באופן עצמאי</span><h2>מקום לתלמידים.<br />כלים למורים.</h2><p class="mb-0 mt-3">מתחילים בלמידה עצמאית. בהמשך תוכלו להצטרף לקבוצת מורה, לקבל משימות וליווי אישי. חשבונות מורים יאושרו בידי מנהל המערכת.</p></div>
+        <div class="col-lg-4 text-lg-end"><a class="btn btn-light btn-lg" href="/register">ניפגש ב־SpeakReady <span aria-hidden="true">←</span></a></div>
+    </div></div>
+</section>

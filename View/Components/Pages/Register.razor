@@ -1,0 +1,19 @@
+@page "/register"
+<PageTitle>הרשמה | SpeakReady</PageTitle>
+<section class="auth-section">
+    <div class="container"><div class="row g-5 align-items-center justify-content-center">
+        <div class="col-lg-5 auth-intro"><span class="eyebrow">LET'S FIND YOUR VOICE</span><h1>הצעד הראשון<br />מתחיל <span class="highlight-word">כאן.</span></h1><p class="lead mt-4">מסלול אישי לתרגול אנגלית,<br />עם מקום ללמוד ולהשתפר.</p><ul class="auth-benefits list-unstyled"><li><span>01</span> לומדים בקצב שמתאים לכם</li><li><span>02</span> מתרגלים תשובות עם משמעות</li><li><span>03</span> מצטרפים למורה כשרוצים</li></ul></div>
+        <div class="col-md-9 col-lg-5"><div class="auth-card card border-0"><div class="card-body p-4 p-md-5">
+            <span class="small text-secondary">נעים להכיר</span><h2 class="h3 mt-2 mb-4">יוצרים חשבון תלמיד</h2>
+            <div role="form" aria-describedby="register-stage">
+                <Field Id="reg-name" Label="שם מלא" Placeholder="איך קוראים לכם?" Autocomplete="name" MaxLength="100" />
+                <Field Id="reg-username" Label="שם משתמש" Dir="ltr" Placeholder="your_username" Autocomplete="username" MaxLength="50" />
+                <Field Id="reg-email" Label="כתובת דואר אלקטרוני" Type="email" Dir="ltr" Placeholder="name@example.com" Autocomplete="email" />
+                <Field Id="reg-password" Label="סיסמה" Type="password" Dir="ltr" Autocomplete="new-password" MaxLength="128" />
+                <Field Id="reg-confirm" Label="אימות סיסמה" Type="password" Dir="ltr" Autocomplete="new-password" MaxLength="128" />
+                <button type="button" class="btn btn-primary btn-lg w-100 mt-3">יוצרים חשבון <span aria-hidden="true">←</span></button>
+            </div>
+            <p id="register-stage" class="small text-secondary mt-3 mb-0">תצוגה מקדימה: ההרשמה עדיין אינה פעילה.</p>
+        </div></div><p class="text-center mt-4">כבר יש לכם חשבון? <a class="text-link" href="/login">נכנסים כאן</a></p></div>
+    </div></div>
+</section>

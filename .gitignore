@@ -1,0 +1,35 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.rsuser
+*.userosscache
+*.sln.docstates
+
+# Build output
+**/bin/
+**/obj/
+Debug/
+Release/
+
+# Test and temporary files
+TestResults/
+*.log
+*.tmp
+*.bak
+
+# Secrets and local configuration
+secrets.json
+.env
+.env.*
+!.env.example
+appsettings.Local.json
+appsettings.*.local.json
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Local submission notes
+docs/VERIFICATION.md
+docs/VIDEO_SCRIPT.md

@@ -1,0 +1,16 @@
+[
+  {
+    "Name": "SpeakReady - API + View",
+    "Projects": [
+      {
+        "Path": "API\\API.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "View\\View.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]
+

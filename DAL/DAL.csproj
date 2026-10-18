@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\Model\Model.csproj" />
+    <PackageReference Include="MySql.Data" Version="26.7.0" />
+    <EmbeddedResource Include="Schema.sql" />
+  </ItemGroup>
+</Project>
+

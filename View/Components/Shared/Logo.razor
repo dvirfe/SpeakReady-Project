@@ -1,0 +1,6 @@
+<span class="brand" dir="ltr">
+    <img src="@Assets["images/favicon.svg"]" alt="" width="38" height="38" />
+    <span class="brand-word">Speak<span>Ready</span></span>
+    @if (!Compact) { <span class="brand-tag" dir="rtl">מוצאים את הקול שלכם</span> }
+</span>
+@code { [Parameter] public bool Compact { get; set; } }
