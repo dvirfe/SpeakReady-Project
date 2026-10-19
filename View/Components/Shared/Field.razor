@@ -1,14 +1,51 @@
 <div class="mb-3">
-    <label for="@Id" class="form-label">@Label <span class="required-marker" aria-hidden="true">*</span></label>
-    <input id="@Id" name="@Id" type="@Type" dir="@Dir" class="form-control form-control-lg"
-           placeholder="@Placeholder" autocomplete="@Autocomplete" maxlength="@MaxLength" />
+    <label for="@Id" class="form-label">
+        @Label
+        <span class="required-marker" aria-hidden="true">*</span>
+    </label>
+
+    <input id="@Id"
+           name="@Id"
+           type="@Type"
+           dir="@Dir"
+           class="form-control form-control-lg"
+           placeholder="@Placeholder"
+           autocomplete="@Autocomplete"
+           maxlength="@MaxLength"
+           value="@Value"
+           @oninput="OnValueChanged" />
 </div>
+
 @code {
-    [Parameter, EditorRequired] public string Id { get; set; } = "";
-    [Parameter, EditorRequired] public string Label { get; set; } = "";
-    [Parameter] public string Type { get; set; } = "text";
-    [Parameter] public string Dir { get; set; } = "rtl";
-    [Parameter] public string? Placeholder { get; set; }
-    [Parameter] public string? Autocomplete { get; set; }
-    [Parameter] public int MaxLength { get; set; } = 254;
+    [Parameter, EditorRequired]
+    public string Id { get; set; } = "";
+
+    [Parameter, EditorRequired]
+    public string Label { get; set; } = "";
+
+    [Parameter]
+    public string Type { get; set; } = "text";
+
+    [Parameter]
+    public string Dir { get; set; } = "rtl";
+
+    [Parameter]
+    public string? Placeholder { get; set; }
+
+    [Parameter]
+    public string? Autocomplete { get; set; }
+
+    [Parameter]
+    public int MaxLength { get; set; } = 254;
+
+    [Parameter]
+    public string? Value { get; set; }
+
+    [Parameter]
+    public EventCallback<string?> ValueChanged { get; set; }
+
+    private Task OnValueChanged(ChangeEventArgs e)
+    {
+        return ValueChanged.InvokeAsync(e.Value?.ToString());
+    }
 }
