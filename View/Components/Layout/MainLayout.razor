@@ -1,28 +1,95 @@
 @inherits LayoutComponentBase
+@implements IDisposable
+@inject UserSession Session
+@inject NavigationManager Navigation
+
 <a class="skip-link" href="#main-content">דילוג לתוכן</a>
+
 <header class="site-header">
-    <nav class="container d-flex align-items-center justify-content-between gap-3 py-3" aria-label="ניווט ראשי">
-        <a class="brand-link" href="/" aria-label="SpeakReady - דף הבית"><Logo /></a>
+    <nav class="container d-flex align-items-center justify-content-between gap-3 py-3"
+         aria-label="ניווט ראשי">
+
+        <a class="brand-link" href="/" aria-label="SpeakReady - דף הבית">
+            <Logo />
+        </a>
+
         <div class="nav-links d-none d-lg-flex gap-4">
             <a href="/#how-it-works">איך זה עובד</a>
             <a href="/#learning-path">מסלול הלמידה</a>
             <a href="/#teachers">למורים</a>
         </div>
+
         <div class="d-flex align-items-center gap-2">
-            <a class="login-link" href="/login">כניסה</a>
-            <a class="btn btn-primary nav-cta" href="/register">מתחילים לתרגל <span aria-hidden="true">↖</span></a>
+
+            @if (Session.IsLoggedIn)
+            {
+                <span class="fw-semibold">
+                    שלום, @Session.Username
+                </span>
+
+                <button type="button"
+                        class="btn btn-outline-primary"
+                        @onclick="Logout">
+                    התנתקות
+                </button>
+            }
+            else
+            {
+                <a class="login-link" href="/login">
+                    כניסה
+                </a>
+
+                <a class="btn btn-primary nav-cta" href="/register">
+                    מתחילים לתרגל
+                    <span aria-hidden="true">↖</span>
+                </a>
+            }
+
         </div>
     </nav>
 </header>
-<main id="main-content">@Body</main>
+
+<main id="main-content">
+    @Body
+</main>
+
 <footer class="site-footer">
     <div class="container py-4 d-flex flex-wrap justify-content-between align-items-center gap-3">
         <Logo Compact="true" />
-        <p class="m-0 small">צעד קטן בתרגול. יותר ביטחון בדיבור.</p>
-        <span class="small">פרויקט גמר בהנדסת תוכנה · דביר · 2026</span>
+        <p class="m-0 small">
+            צעד קטן בתרגול. יותר ביטחון בדיבור.
+        </p>
+        <span class="small">
+            פרויקט גמר בהנדסת תוכנה · דביר · 2026
+        </span>
     </div>
 </footer>
+
 <div id="blazor-error-ui" role="alert">
-    החיבור לאתר נותק. <a href="" class="reload">טעינה מחדש</a>
+    החיבור לאתר נותק.
+    <a href="" class="reload">טעינה מחדש</a>
     <button class="dismiss" aria-label="סגירת ההודעה">×</button>
 </div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        Session.OnChange += OnSessionChanged;
+    }
+
+    private void OnSessionChanged()
+    {
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private void Logout()
+    {
+        Session.Logout();
+        Navigation.NavigateTo("/");
+    }
+
+    public void Dispose()
+    {
+        Session.OnChange -= OnSessionChanged;
+    }
+}

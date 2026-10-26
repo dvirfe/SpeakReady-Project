@@ -15,7 +15,10 @@ public class User : BaseEntity
     public bool IsActive { get; set; }
     public DateTime CreatedAt { get; set; }
 
-    // משתמש חדש מקבל תפקיד תלמיד. המזהה נקבע רק בעת השמירה.
+    public User() : base()
+    {
+    }
+    // משתמש חדש מקבל תפקיד תלמיד. המזהה נקבע רק בעת השמירה
     public User(string username, string fullName, string email, string passwordHash)
         : this(0, username, fullName, email, passwordHash, UserRole.Student,
             TeacherRequestState.None, true, DateTime.UtcNow) { }
