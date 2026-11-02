@@ -2,12 +2,13 @@ using DAL;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.WebHost.UseUrls("http://localhost:5214");
 
-// V1-V4 הוא שלב מקומי: עדיין אין התחברות עם session והרשאות ניהול.
+// הפרויקט פועל כרגע בסביבת פיתוח מקומית.
+// עדיין אין מערכת הרשאות מלאה לפעולות הניהול ב-API.
 // לא חושפים את פעולות הניהול באינטרנט לפני מימוש שכבת ההרשאות.
 if (!builder.Environment.IsDevelopment())
-    throw new InvalidOperationException("This V1-V4 learning build runs in Development only.");
-
+    throw new InvalidOperationException("This project runs in Development only.");
 var serverConnection = builder.Configuration.GetConnectionString("DefaultConnection");
 if (string.IsNullOrWhiteSpace(serverConnection))
     throw new InvalidOperationException("Set ConnectionStrings:DefaultConnection in API User Secrets. See README.");
@@ -19,17 +20,6 @@ builder.Services.AddProblemDetails();
 builder.Services.AddSingleton(new UserDB(DatabaseInitializer.GetDatabaseConnectionString(serverConnection)));
 
 var app = builder.Build();
-// מניעת חשיפה מקרית לרשת בשלב הבדיקות המקומי.
-app.Use(async (context, next) =>
-{
-    var address = context.Connection.RemoteIpAddress;
-    if (address is null || !System.Net.IPAddress.IsLoopback(address))
-    {
-        context.Response.StatusCode = StatusCodes.Status403Forbidden;
-        return;
-    }
-    await next();
-});
 app.UseExceptionHandler();
 
 // האתחול רץ לפני קבלת הבקשה הראשונה. כישלון חיבור עוצר את ההרצה.
@@ -41,6 +31,10 @@ if (seed && string.IsNullOrEmpty(demoPassword))
 await DatabaseInitializer.InitializeAsync(serverConnection, demoPassword);
 app.MapOpenApi();
 app.MapControllers();
-app.MapGet("/health", () => Results.Ok(new { status = "ready", project = "SpeakReady", stage = "V1-V4" }));
-app.Run();
+app.MapGet("/health", () => Results.Ok(new
+{
+    status = "ready",
+    project = "SpeakReady",
+    stage = "V7"
+})); app.Run();
 

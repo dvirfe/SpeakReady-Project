@@ -5,7 +5,6 @@ namespace DAL;
 
 public static class DatabaseInitializer
 {
-    // שם חדש ונפרד. אין נגיעה בבסיס הנתונים של החנות או של המורה.
     public const string DatabaseName = "SpeakReadyDB";
 
     public static string GetDatabaseConnectionString(string serverConnectionString)
@@ -30,10 +29,14 @@ public static class DatabaseInitializer
         await connection.OpenAsync();
         using (var utc = new MySqlCommand("SET time_zone = '+00:00';", connection))
             await utc.ExecuteNonQueryAsync();
-        using var stream = typeof(DatabaseInitializer).Assembly.GetManifestResourceStream("DAL.Schema.sql")
-            ?? throw new InvalidOperationException("Schema.sql resource is missing.");
-        using var reader = new StreamReader(stream);
-        var schema = await reader.ReadToEndAsync();
+        string filePath = Path.Combine(AppContext.BaseDirectory, "Schema.sql");
+
+        if (!File.Exists(filePath))
+        {
+            throw new FileNotFoundException("Schema.sql file was not found.");
+        }
+
+        string schema = await File.ReadAllTextAsync(filePath);
         // ה-DDL הקבוע שלנו אינו מכיל פרוצדורות או ; בתוך טקסט.
         foreach (var statement in schema.Split(';', StringSplitOptions.RemoveEmptyEntries))
         {
@@ -69,7 +72,7 @@ public static class DatabaseInitializer
             command.Parameters.AddWithValue("@username", username);
             command.Parameters.AddWithValue("@name", fullName);
             command.Parameters.AddWithValue("@email", $"{username}@speakready.example");
-            command.Parameters.AddWithValue("@hash", PasswordHasher.Hash(demoPassword));
+            command.Parameters.AddWithValue("@hash", BCrypt.Net.BCrypt.HashPassword(demoPassword));
             command.Parameters.AddWithValue("@role", role.ToString());
             command.Parameters.AddWithValue("@request", role == UserRole.Teacher ? "Approved" : "None");
             await command.ExecuteNonQueryAsync();

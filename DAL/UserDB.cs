@@ -1,6 +1,6 @@
-using System.Data.Common;
 using Model;
 using MySql.Data.MySqlClient;
+using System.Data.Common;
 
 namespace DAL;
 
@@ -46,7 +46,7 @@ public class UserDB(string connectionString)
         command.Parameters.AddWithValue("@username", user.Username);
         command.Parameters.AddWithValue("@name", user.FullName);
         command.Parameters.AddWithValue("@email", user.Email);
-        command.Parameters.AddWithValue("@hash", user.PasswordHash);
+        command.Parameters.AddWithValue("@hash", BCrypt.Net.BCrypt.HashPassword(user.PasswordHash));
         try { await command.ExecuteNonQueryAsync(); return checked((int)command.LastInsertedId); }
         catch (MySqlException ex) when (ex.Number == 1062) { throw new DuplicateUserException(ex); }
     }
@@ -91,8 +91,15 @@ public class UserDB(string connectionString)
         using var reader = await command.ExecuteReaderAsync();
         if (!await reader.ReadAsync()) return null;
         var user = ReadUser(reader);
-        // השוואה רגישה לאותיות באמצעות Hash, ולא השוואת טקסט ב-MySQL.
-        return PasswordHasher.Verify(password, user.PasswordHash) ? user : null;
+        bool isPasswordCorrect = BCrypt.Net.BCrypt.Verify(password,user.PasswordHash);
+        if (isPasswordCorrect)
+        {
+            return user;
+        }
+        else
+        {
+            return null;
+        }
     }
 
     public async Task<List<RoleCount>> CountUsersByRoleAsync()
@@ -116,9 +123,15 @@ public class UserDB(string connectionString)
             """, id, role.ToString());
     }
 
-    public Task<bool> UpdatePasswordAsync(int id, string password) =>
-        UpdateAsync("UPDATE Users SET PasswordHash = @value WHERE UserId = @id;", id, PasswordHasher.Hash(password));
+    public Task<bool> UpdatePasswordAsync(int id, string password)
+    {
+        string hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
 
+        return UpdateAsync(
+            "UPDATE Users SET PasswordHash = @value WHERE UserId = @id;",
+            id,
+            hashedPassword);
+    }
     public Task<bool> UpdateEmailAsync(int id, string email) =>
         UpdateAsync("UPDATE Users SET Email = @value WHERE UserId = @id;", id, email);
 

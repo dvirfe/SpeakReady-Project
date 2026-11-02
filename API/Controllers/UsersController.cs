@@ -39,7 +39,7 @@ public class UsersController(UserDB users) : ControllerBase
             return Conflict(new { message = "שם המשתמש כבר תפוס." });
         if (await users.EmailExistsAsync(email))
             return Conflict(new { message = "כתובת הדואר כבר רשומה." });
-        var user = new User(username, request.FullName.Trim(), email, PasswordHasher.Hash(request.Password));
+        var user = new User(username, request.FullName.Trim(), email, request.Password);
         try { user.Id = await users.AddUserAsync(user); }
         catch (DuplicateUserException) { return Conflict(new { message = "שם המשתמש או כתובת הדואר כבר רשומים." }); }
         return CreatedAtAction(nameof(GetById), new { id = user.Id }, await users.GetUserByIdAsync(user.Id));
