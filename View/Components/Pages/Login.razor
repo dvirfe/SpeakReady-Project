@@ -165,6 +165,21 @@
             isBusy = false;
         }
 
-        Navigation.NavigateTo("/");
+        if (Session.Role == UserRole.Student)
+        {
+            Navigation.NavigateTo("/student");
+        }
+        else if (Session.Role == UserRole.Teacher)
+        {
+            Navigation.NavigateTo("/teacher");
+        }
+        else if (Session.Role == UserRole.Admin)
+        {
+            Navigation.NavigateTo("/admin");
+        }
+        else
+        {
+            Navigation.NavigateTo("/access-denied");
+        }
     }
 }

@@ -1,0 +1,31 @@
+﻿@page "/admin"
+@using Model
+@using View.Services
+@inject UserSession Session
+@inject NavigationManager Navigation
+
+<PageTitle>אזור מנהל | SpeakReady</PageTitle>
+
+@* התוכן מוצג רק למשתמש מחובר בתפקיד מנהל. *@
+@if (Session.IsLoggedIn && Session.Role == UserRole.Admin)
+{
+    <h1>ברוכים הבאים לאזור המנהל</h1>
+}
+
+@code {
+    // בודקים התחברות ותפקיד בעת פתיחת הדף.
+    protected override void OnInitialized()
+    {
+        if (!Session.IsLoggedIn)
+        {
+            Navigation.NavigateTo("/login");
+            return;
+        }
+
+        if (Session.Role != UserRole.Admin)
+        {
+            Navigation.NavigateTo("/access-denied");
+            return;
+        }
+    }
+}

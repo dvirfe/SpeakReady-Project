@@ -1,0 +1,31 @@
+﻿@page "/teacher"
+@using Model
+@using View.Services
+@inject UserSession Session
+@inject NavigationManager Navigation
+
+<PageTitle>אזור מורה | SpeakReady</PageTitle>
+
+@* התוכן מוצג רק למשתמש מחובר בתפקיד מורה. *@
+@if (Session.IsLoggedIn && Session.Role == UserRole.Teacher)
+{
+    <h1>ברוכים הבאים לאזור המורה</h1>
+}
+
+@code {
+    // בודקים התחברות ותפקיד בעת פתיחת הדף.
+    protected override void OnInitialized()
+    {
+        if (!Session.IsLoggedIn)
+        {
+            Navigation.NavigateTo("/login");
+            return;
+        }
+
+        if (Session.Role != UserRole.Teacher)
+        {
+            Navigation.NavigateTo("/access-denied");
+            return;
+        }
+    }
+}

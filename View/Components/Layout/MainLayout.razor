@@ -23,6 +23,18 @@
 
             @if (Session.IsLoggedIn)
             {
+                @if (Session.Role == Model.UserRole.Student)
+                {
+                    <a class="login-link" href="/student">אזור תלמיד</a>
+                }
+                else if (Session.Role == Model.UserRole.Teacher)
+                {
+                    <a class="login-link" href="/teacher">אזור מורה</a>
+                }
+                else if (Session.Role == Model.UserRole.Admin)
+                {
+                    <a class="login-link" href="/admin">אזור מנהל</a>
+                }
                 <span class="fw-semibold">
                     שלום, @Session.Username
                 </span>

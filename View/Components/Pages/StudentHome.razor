@@ -1,0 +1,34 @@
+﻿@page "/student"
+@using Model
+@using View.Services
+@inject UserSession Session
+@inject NavigationManager Navigation
+
+<PageTitle>אזור תלמיד | SpeakReady</PageTitle>
+
+@* מציגים את תוכן הדף רק למשתמש מחובר בתפקיד תלמיד. *@
+@if (Session.IsLoggedIn && Session.Role == UserRole.Student)
+{
+    <h1>ברוכים הבאים לאזור התלמיד</h1>
+}
+
+
+@code {
+    // בודקים הרשאה בעת פתיחת הדף.
+    protected override void OnInitialized()
+    {
+        // אורח מועבר לדף הכניסה.
+        if (!Session.IsLoggedIn)
+        {
+            Navigation.NavigateTo("/login");
+            return;
+        }
+
+        // משתמש מחובר שאינו תלמיד מועבר לדף אין הרשאה.
+        if (Session.Role != UserRole.Student)
+        {
+            Navigation.NavigateTo("/access-denied");
+            return;
+        }
+    }
+}
