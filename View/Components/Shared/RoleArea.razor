@@ -1,0 +1,58 @@
+@using Model
+@using View.Services
+@implements IDisposable
+@inject UserSession Session
+@inject NavigationManager Navigation
+
+@* מציג תוכן רק לתפקיד שנבחר. כל הדפים הפנימיים משתמשים בבדיקת ההרשאה של שלב 8. *@
+@if (Session.IsLoggedIn && Session.Role == AllowedRole)
+{
+    @ChildContent
+}
+
+@code {
+    [Parameter] public UserRole AllowedRole { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    // נרשמים לשינויים כדי להסתיר תוכן גם לאחר התנתקות.
+    protected override void OnInitialized()
+    {
+        Session.OnChange += HandleSessionChanged;
+    }
+
+    // בודקים גם כשעוברים בין דפים שמשתמשים באותו רכיב.
+    protected override void OnParametersSet()
+    {
+        CheckAccess();
+    }
+
+    private void CheckAccess()
+    {
+        if (!Session.IsLoggedIn)
+        {
+            Navigation.NavigateTo("/login");
+            return;
+        }
+
+        if (Session.Role != AllowedRole)
+        {
+            Navigation.NavigateTo("/access-denied");
+        }
+    }
+
+    private void HandleSessionChanged()
+    {
+        _ = InvokeAsync(() =>
+        {
+            CheckAccess();
+            StateHasChanged();
+        });
+    }
+
+    // מסירים את ההרשמה כשהרכיב יוצא מהמסך.
+    public void Dispose()
+    {
+        Session.OnChange -= HandleSessionChanged;
+    }
+}
+

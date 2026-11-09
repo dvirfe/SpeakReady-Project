@@ -1,0 +1,15 @@
+﻿@page "/teacher/report"
+<PageTitle>דוח תלמיד | SpeakReady</PageTitle>
+
+<RoleArea AllowedRole="UserRole.Teacher">
+    <div class="sr-page container">
+        <InnerHeading Eyebrow="נועה לוי · תלמידה לדוגמה" Title="מבינים מה כדאי לחזק." Description="דוח לדוגמה המסייע למורה לבחור תרגול המשך." />
+        <p class="sr-demo-note">דוח מומצא לצורך העיצוב. במימוש העתידי תיבדק גם ההרשאה של המורה לתלמיד המסוים.</p>
+        <FeedbackReport />
+        <nav class="sr-toolbar mt-4" aria-label="פעולות מורה">
+            <a class="btn btn-primary" href="/teacher/lessons">בחירת שיעור המשך</a>
+            <a class="btn btn-outline-primary" href="/teacher/students">חזרה לתלמידים</a>
+        </nav>
+    </div>
+</RoleArea>
+

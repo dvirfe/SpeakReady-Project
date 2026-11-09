@@ -1,0 +1,54 @@
+﻿@page "/teacher/lessons"
+<PageTitle>ספריית שיעורים ושיוך | SpeakReady</PageTitle>
+
+<RoleArea AllowedRole="UserRole.Teacher">
+    <div class="sr-page container">
+        <InnerHeading Eyebrow="בונים מסלול אישי" Title="השיעור הנכון, בזמן הנכון." Description="בחרו מתוך ספריית השיעורים את התרגול שמתאים לתלמיד." />
+        <a class="sr-text-link" href="/teacher">חזרה לאזור המורה</a>
+        <p class="sr-demo-note mt-3">דוגמת עיצוב. הבחירה אינה נשמרת ואינה מוסיפה שיעור למסלול.</p>
+        <div class="row g-4">
+            <div class="col-lg-7">
+                <article class="sr-panel mb-3">
+                    <span class="sr-badge">רמת בסיס · היכרות</span>
+                    <h2>קצת על עצמי</h2>
+                    <p>הצגה עצמית, תחביבים ובניית משפטים פשוטים.</p>
+                </article>
+                <article class="sr-panel mb-3">
+                    <span class="sr-badge">רמת ביניים · דקדוק</span>
+                    <h2>חוויה מהעבר</h2>
+                    <p>תיאור אירוע עם פעלים בזמן עבר.</p>
+                </article>
+                <article class="sr-panel">
+                    <span class="sr-badge">רמת ביניים · תוכן</span>
+                    <h2>בונים תשובה מלאה</h2>
+                    <p>רעיון מרכזי, סיבה ודוגמה.</p>
+                </article>
+            </div>
+            <div class="col-lg-5">
+                <section class="sr-panel">
+                    <h2>שיוך למסלול</h2>
+                    <label class="form-label mt-3" for="assignment-student">תלמיד או קבוצה</label>
+                    <select class="form-select" id="assignment-student">
+                        <option>נועה לוי</option>
+                        <option>איתי כהן</option>
+                        <option>כל קבוצת הדיבור</option>
+                    </select>
+                    <label class="form-label mt-3" for="assignment-lesson">שיעור</label>
+                    <select class="form-select" id="assignment-lesson">
+                        <option>חוויה מהעבר</option>
+                        <option>קצת על עצמי</option>
+                        <option>בונים תשובה מלאה</option>
+                    </select>
+                    <label class="form-label mt-3" for="assignment-order">מיקום במסלול</label>
+                    <input class="form-control" id="assignment-order" type="number" min="1" value="3" />
+                    <label class="form-label mt-3" for="assignment-note">הנחיה לתלמיד</label>
+                    <textarea class="form-control" id="assignment-note" rows="3" placeholder="למשל: נסה להוסיף דוגמה לכל תשובה">
+                    </textarea>
+                    <button type="button" class="btn btn-primary mt-4 w-100" disabled>שיוך שיעור</button>
+                    <p class="small mt-2 mb-0">השמירה תהיה זמינה בשלב המימוש.</p>
+                </section>
+            </div>
+        </div>
+    </div>
+</RoleArea>
+

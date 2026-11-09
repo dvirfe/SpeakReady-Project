@@ -1,0 +1,84 @@
+﻿@page "/admin/users"
+<PageTitle>ניהול משתמשים | SpeakReady</PageTitle>
+
+<RoleArea AllowedRole="UserRole.Admin">
+    <div class="sr-page container">
+        <InnerHeading Eyebrow="ניהול האתר" Title="האנשים שמאחורי המסלולים." Description="משתמשים, תפקידים ובקשות הצטרפות למורים." />
+        <a class="sr-text-link" href="/admin">חזרה לאזור המנהל</a>
+        <p class="sr-demo-note mt-3">שמות וכתובות לדוגמה. הכפתורים אינם משנים חשבונות או הרשאות.</p>
+        <div class="sr-table-wrap">
+            <table class="table sr-table">
+                <caption>רשימת משתמשים לדוגמה</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">שם</th>
+                        <th scope="col">דואר אלקטרוני</th>
+                        <th scope="col">תפקיד</th>
+                        <th scope="col">מצב</th>
+                        <th scope="col">ניהול</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th scope="row">נועה לוי</th>
+                        <td>
+                            <bdi>noa@example.com</bdi>
+                        </td>
+                        <td>תלמיד</td>
+                        <td>פעיל</td>
+                        <td>
+                            <button class="btn btn-outline-primary btn-sm" type="button" disabled>עריכה</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">דנה כהן</th>
+                        <td>
+                            <bdi>dana@example.com</bdi>
+                        </td>
+                        <td>מורה</td>
+                        <td>פעיל</td>
+                        <td>
+                            <button class="btn btn-outline-primary btn-sm" type="button" disabled>עריכה</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">איתי ישראלי</th>
+                        <td>
+                            <bdi>itai@example.com</bdi>
+                        </td>
+                        <td>תלמיד</td>
+                        <td>לא פעיל</td>
+                        <td>
+                            <button class="btn btn-outline-primary btn-sm" type="button" disabled>הפעלה</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <section class="sr-panel mt-4">
+            <h2>בקשות להצטרפות כמורה</h2>
+            <div class="sr-request">
+                <div>
+                    <strong>רוני לוי</strong>
+                    <p class="mb-0">מורה לאנגלית · בקשה לדוגמה</p>
+                </div>
+                <div class="sr-toolbar">
+                    <button class="btn btn-primary" type="button" disabled>אישור</button>
+                    <button class="btn btn-outline-primary" type="button" disabled>דחייה</button>
+                </div>
+            </div>
+            <div class="sr-request">
+                <div>
+                    <strong>עדי כהן</strong>
+                    <p class="mb-0">מורה לאנגלית · בקשה לדוגמה</p>
+                </div>
+                <div class="sr-toolbar">
+                    <button class="btn btn-primary" type="button" disabled>אישור</button>
+                    <button class="btn btn-outline-primary" type="button" disabled>דחייה</button>
+                </div>
+            </div>
+            <p class="small mb-0">פעולות הניהול יהיו זמינות בשלב המימוש.</p>
+        </section>
+    </div>
+</RoleArea>
+

@@ -1,0 +1,29 @@
+﻿@page "/student/start"
+<PageTitle>מתחילים ללמוד | SpeakReady</PageTitle>
+
+<RoleArea AllowedRole="UserRole.Student">
+    <div class="sr-page container">
+        <InnerHeading Eyebrow="ברוכים הבאים למסלול" Title="קודם מכירים אותך." Description="אבחון קצר יעזור לזהות במה כדאי להתמקד בתרגול." />
+        <p class="sr-demo-note">תצוגת היכרות לדוגמה. בחירת הקישורים אינה משנה את החשבון.</p>
+        <div class="row g-4">
+            <div class="col-md-6">
+                <article class="sr-panel h-100">
+                    <span class="sr-kicker">לומדים עצמאית</span>
+                    <h2>בקצב שלך</h2>
+                    <p>מתחילים באבחון, מקבלים תמונת מצב ומתקדמים במסלול מוכן לפי הרמה.</p>
+                    <a class="btn btn-primary" href="/student/diagnostic">לשיעור האבחון</a>
+                </article>
+            </div>
+            <div class="col-md-6">
+                <article class="sr-panel h-100">
+                    <span class="sr-kicker">לומדים עם מורה</span>
+                    <h2>עם הכוונה בדרך</h2>
+                    <p>המורה יוכל להיעזר בדוח ולבחור עבורך את השיעורים המתאימים.</p>
+                    <a class="btn btn-outline-primary" href="/student/assigned">למסלול עם המורה לדוגמה</a>
+                </article>
+            </div>
+        </div>
+        <a class="sr-text-link mt-4 d-inline-block" href="/student">חזרה למסלול שלי</a>
+    </div>
+</RoleArea>
+

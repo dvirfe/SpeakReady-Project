@@ -4,7 +4,6 @@ using System.Data.Common;
 
 namespace DAL;
 
-// מחלקה זו מחזיקה מחרוזת חיבור בלבד. לכל פעולה חיבור משלה, ולכן Singleton בטוח כאן.
 public class UserDB(string connectionString)
 {
     private const string SelectUser = """

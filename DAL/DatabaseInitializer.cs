@@ -15,7 +15,6 @@ public static class DatabaseInitializer
 
     public static async Task InitializeAsync(string serverConnectionString, string? demoPassword)
     {
-        // Builder מונע תלות בנקודה-פסיק או בשם מסד שהוכנס בטעות להגדרות.
         var builder = new MySqlConnectionStringBuilder(serverConnectionString) { Database = "" };
         using (var server = new MySqlConnection(builder.ConnectionString))
         {
@@ -37,7 +36,6 @@ public static class DatabaseInitializer
         }
 
         string schema = await File.ReadAllTextAsync(filePath);
-        // ה-DDL הקבוע שלנו אינו מכיל פרוצדורות או ; בתוך טקסט.
         foreach (var statement in schema.Split(';', StringSplitOptions.RemoveEmptyEntries))
         {
             if (string.IsNullOrWhiteSpace(statement)) continue;
@@ -55,16 +53,33 @@ public static class DatabaseInitializer
 
     private static async Task SeedUsersAsync(MySqlConnection connection, string demoPassword)
     {
-        // אתחול נתוני הדגמה רק כאשר הטבלה ריקה. הרצה חוזרת אינה מאפסת סיסמאות או תפקידים.
         using var count = new MySqlCommand("SELECT COUNT(*) FROM Users;", connection);
         if (Convert.ToInt64(await count.ExecuteScalarAsync()) != 0) return;
 
         using var transaction = connection.BeginTransaction();
         for (int index = 0; index < 10; index++)
         {
-            var role = index == 0 ? UserRole.Admin : index < 3 ? UserRole.Teacher : UserRole.Student;
-            string username = index == 0 ? "admin" : index < 3 ? $"teacher{index}" : $"student{index - 2}";
-            string fullName = index == 0 ? "מנהל הדגמה" : index < 3 ? $"מורה לדוגמה {index}" : $"תלמיד לדוגמה {index - 2}";
+            UserRole role;
+            string username;
+            string fullName;
+            if (index == 0)
+            {
+                role = UserRole.Admin;
+                username = "admin";
+                fullName = "מנהל הדגמה";
+            }
+            else if (index < 3)
+            {
+                role = UserRole.Teacher;
+                username = $"teacher{index}";
+                fullName = $"מורה לדוגמה {index}";
+            }
+            else
+            {
+                role = UserRole.Student;
+                username = $"student{index - 2}";
+                fullName = $"תלמיד לדוגמה {index - 2}";
+            }
             using var command = new MySqlCommand("""
                 INSERT INTO Users (Username, FullName, Email, PasswordHash, Role, TeacherRequestStatus)
                 VALUES (@username, @name, @email, @hash, @role, @request);

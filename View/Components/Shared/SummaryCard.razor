@@ -1,0 +1,13 @@
+@* כרטיס נתון משותף ללוחות התלמיד, המורה והמנהל. הנתונים בשלב 9 קבועים. *@
+<article class="sr-summary">
+    <p>@Label</p>
+    <strong>@Value</strong>
+    <span>@Note</span>
+</article>
+
+@code {
+    [Parameter] public string Label { get; set; } = string.Empty;
+    [Parameter] public string Value { get; set; } = string.Empty;
+    [Parameter] public string Note { get; set; } = string.Empty;
+}
+

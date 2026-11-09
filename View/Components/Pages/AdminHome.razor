@@ -1,31 +1,43 @@
 ﻿@page "/admin"
-@using Model
-@using View.Services
-@inject UserSession Session
-@inject NavigationManager Navigation
+@* אזור המנהל. מיועד לתפקיד Admin; כל הנתונים קבועים לצורך עיצוב שלב 9. *@
+<PageTitle>אזור המנהל | SpeakReady</PageTitle>
 
-<PageTitle>אזור מנהל | SpeakReady</PageTitle>
+<RoleArea AllowedRole="UserRole.Admin">
+    <div class="sr-page container">
+        <InnerHeading Eyebrow="מאחורי הקלעים של הלמידה" Title="תמונת המצב של SpeakReady." Description="ניהול משתמשים ומעקב אחר הפעילות באתר." />
+        <p class="sr-demo-note">לוח ניהול לדוגמה. הנתונים אינם מחושבים מהמערכת.</p>
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <SummaryCard Label="תלמידים רשומים" Value="48" Note="עם מורה ובלמידה עצמאית" />
+            </div>
+            <div class="col-md-4">
+                <SummaryCard Label="מורים פעילים" Value="6" Note="מכוונים את מסלולי הלמידה" />
+            </div>
+            <div class="col-md-4">
+                <SummaryCard Label="בקשות מורה" Value="2" Note="ממתינות לעיון" />
+            </div>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-7">
+                <article class="sr-panel h-100">
+                    <h2>ניהול משתמשים</h2>
+                    <p>עיון בתפקידים, במצב החשבון ובבקשות להצטרף כמורה.</p>
+                    <a class="btn btn-primary" href="/admin/users">לניהול המשתמשים</a>
+                </article>
+            </div>
+            <div class="col-md-5">
+                <article class="sr-panel h-100">
+                    <span class="sr-kicker">פעילות לדוגמה השבוע</span>
+                    <h2>יותר הזדמנויות לדבר</h2>
+                    <p>
+                        <strong>24</strong> תרגולים הושלמו.</p>
+                    <p>
+                        <strong>7</strong> תלמידים התחילו אבחון.</p>
+                    <p class="mb-0">
+                        <strong>5</strong> שיעורים שויכו על ידי מורים.</p>
+                </article>
+            </div>
+        </div>
+    </div>
+</RoleArea>
 
-@* התוכן מוצג רק למשתמש מחובר בתפקיד מנהל. *@
-@if (Session.IsLoggedIn && Session.Role == UserRole.Admin)
-{
-    <h1>ברוכים הבאים לאזור המנהל</h1>
-}
-
-@code {
-    // בודקים התחברות ותפקיד בעת פתיחת הדף.
-    protected override void OnInitialized()
-    {
-        if (!Session.IsLoggedIn)
-        {
-            Navigation.NavigateTo("/login");
-            return;
-        }
-
-        if (Session.Role != UserRole.Admin)
-        {
-            Navigation.NavigateTo("/access-denied");
-            return;
-        }
-    }
-}

@@ -1,6 +1,4 @@
 namespace Model;
-
-// שמות המזהים בטבלאות הם מפורשים (LessonId וכו'), ובמחלקות הם Id מהבסיס.
 public class Lesson : BaseEntity
 {
     public string Title { get; set; } = "";
@@ -32,7 +30,6 @@ public class StudyGroup : BaseEntity
     public DateTime CreatedAt { get; set; }
 }
 
-// לטבלת הקישור אין Id מלאכותי. הזוג GroupId + StudentId הוא המפתח.
 public class GroupMember
 {
     public int GroupId { get; set; }

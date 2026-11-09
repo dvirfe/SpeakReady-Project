@@ -52,7 +52,6 @@ public class UsersController(UserDB users) : ControllerBase
         return user is null ? Unauthorized(new { message = "פרטי כניסה שגויים או חשבון לא פעיל." }) : Ok(user);
     }
 
-    // נקודות הבדיקה ב-V3 אינן עדיין מערכת הרשאות מלאה. השרת מוגבל לפיתוח מקומי.
     [HttpPut("{id:int:min(1)}/role")]
     public async Task<IActionResult> UpdateRole(int id, UpdateRoleRequest request)
     {

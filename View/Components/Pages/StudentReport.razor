@@ -1,0 +1,15 @@
+﻿@page "/student/report"
+<PageTitle>תמונת המצב שלי | SpeakReady</PageTitle>
+
+<RoleArea AllowedRole="UserRole.Student">
+    <div class="sr-page container">
+        <InnerHeading Eyebrow="עוצרים, מבינים ומתקדמים" Title="תמונת המצב שלך." Description="מה כבר עובד טוב ומה כדאי לתרגל בצעד הבא." />
+        <p class="sr-demo-note">כל תוכן הדוח מומצא לצורך העיצוב. הוא אינו תוצאה של אבחון שלך או ניתוח AI.</p>
+        <FeedbackReport />
+        <nav class="sr-toolbar mt-4" aria-label="המשך אחרי הדוח">
+            <a class="btn btn-primary" href="/student#next-lesson">למסלול התרגול</a>
+            <a class="btn btn-outline-primary" href="/student/diagnostic">למסך האבחון</a>
+        </nav>
+    </div>
+</RoleArea>
+

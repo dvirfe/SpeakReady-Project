@@ -1,0 +1,53 @@
+﻿@page "/teacher/students"
+<PageTitle>התלמידים שלי | SpeakReady</PageTitle>
+
+<RoleArea AllowedRole="UserRole.Teacher">
+    <div class="sr-page container">
+        <InnerHeading Eyebrow="כל תלמיד והדרך שלו" Title="התלמידים שלי." Description="תמונת מצב קצרה כדי לבחור את הצעד הבא." />
+        <nav class="sr-toolbar" aria-label="ניווט מורה">
+            <a class="btn btn-outline-primary" href="/teacher">לאזור המורה</a>
+            <a class="btn btn-primary" href="/teacher/lessons">שיוך שיעור לדוגמה</a>
+        </nav>
+        <p class="sr-demo-note">התלמידים והנתונים בדף הם דוגמאות בלבד.</p>
+        <div class="sr-table-wrap">
+            <table class="table sr-table">
+                <caption>תלמידים לדוגמה והמיקוד בתרגול שלהם</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">תלמיד</th>
+                        <th scope="col">מיקוד</th>
+                        <th scope="col">התקדמות</th>
+                        <th scope="col">מצב</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th scope="row">נועה לוי</th>
+                        <td>פיתוח תשובות</td>
+                        <td>2 מתוך 6</td>
+                        <td>
+                            <a href="/teacher/report">דוח אבחון לדוגמה</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">איתי כהן</th>
+                        <td>זמן עבר</td>
+                        <td>1 מתוך 4</td>
+                        <td>
+                            <span class="sr-badge">מתרגל</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">מיה ישראלי</th>
+                        <td>טרם נקבע</td>
+                        <td>טרם התחילה</td>
+                        <td>
+                            <span class="sr-badge">ממתינה לאבחון</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</RoleArea>
+

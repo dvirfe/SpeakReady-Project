@@ -1,34 +1,66 @@
 ﻿@page "/student"
-@using Model
-@using View.Services
-@inject UserSession Session
-@inject NavigationManager Navigation
+<PageTitle>המסלול שלי | SpeakReady</PageTitle>
 
-<PageTitle>אזור תלמיד | SpeakReady</PageTitle>
+<RoleArea AllowedRole="UserRole.Student">
+    <div class="sr-page container">
+        <InnerHeading Eyebrow="המסלול האישי שלך" Title="כל צעד מקרב אותך לדיבור בטוח." Description="מתרגלים קצת, לומדים מהמשוב וממשיכים קדימה." />
+        <nav class="sr-toolbar" aria-label="אפשרויות תלמיד">
+            <a class="btn btn-primary" href="/student#next-lesson">המשך לשיעור הבא</a>
+            <a class="btn btn-outline-primary" href="/student/report">תמונת המצב שלי</a>
+            <a class="sr-text-link" href="/student/start">מתחילים כאן</a>
+        </nav>
+        <p class="sr-demo-note">מסלול עצמאי לדוגמה. השיעורים וההתקדמות אינם נתונים אישיים. <a href="/student/assigned">צפייה בדוגמת מסלול עם מורה</a>
+        </p>
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <SummaryCard Label="תחנות שהושלמו" Value="2 מתוך 6" Note="כל תרגול הוא צעד קדימה" />
+            </div>
+            <div class="col-md-4">
+                <SummaryCard Label="המיקוד שלי" Value="תשובות מלאות" Note="רעיון, סיבה ודוגמה" />
+            </div>
+            <div class="col-md-4">
+                <SummaryCard Label="התרגול הבא" Value="כ־5 דקות" Note="מספרים על חוויה מהעבר" />
+            </div>
+        </div>
+        <div class="sr-journey">
+            <section class="sr-landscape sr-meadow" aria-labelledby="meadow-title">
+                <div class="sr-zone-heading">
+                    <span class="sr-kicker">אזור 01 · יוצאים לדרך</span>
+                    <h2 id="meadow-title">מתחילים מהקול שלך</h2>
+                    <p>מכירים את נקודת הפתיחה ובונים ביטחון.</p>
+                </div>
+                <div class="sr-trail">
+                    <LessonStop Number="✓" State="completed" Status="הושלם לדוגמה" Title="מכירים את נקודת הפתיחה" Description="אבחון קצר והיכרות עם החוזקות שלך." Href="/student/report" LinkText="לדוח האבחון לדוגמה" />
+                    <LessonStop Number="✓" State="completed" Status="הושלם לדוגמה" Title="קצת על עצמי" Description="מציגים את עצמנו ומספרים על תחביבים." />
+                </div>
+            </section>
+            <section class="sr-landscape sr-forest" id="next-lesson" aria-labelledby="forest-title">
+                <div class="sr-zone-heading">
+                    <span class="sr-kicker">אזור 02 · צוברים ביטחון</span>
+                    <h2 id="forest-title">יש לך סיפור לספר</h2>
+                    <p>מחברים משפטים לתשובה שיש בה תוכן.</p>
+                </div>
+                <div class="sr-trail">
+                    <LessonStop Number="3" State="current" Status="כאן ממשיכים" Title="חוויה מהעבר" Description="מספרים מה קרה, עם מי היינו ואיך הרגשנו." LinkText="לתרגול לדוגמה" />
+                    <LessonStop Number="4" Status="בהמשך המסלול" Title="בונים תשובה מלאה" Description="מוסיפים סיבה ודוגמה לכל רעיון." />
+                </div>
+            </section>
+            <section class="sr-landscape sr-mountain" aria-labelledby="mountain-title">
+                <div class="sr-zone-heading">
+                    <span class="sr-kicker">אזור 03 · מרחיבים אופקים</span>
+                    <h2 id="mountain-title">מדברים עם יותר ביטחון</h2>
+                    <p>מתרגלים דעה אישית ומביטים על ההתקדמות.</p>
+                </div>
+                <div class="sr-trail">
+                    <LessonStop Number="5" Status="בהמשך המסלול" Title="הדעה שלי חשובה" Description="בוחרים עמדה ומסבירים אותה." />
+                    <LessonStop Number="6" Status="בהמשך המסלול" Title="עוצרים לראות את הדרך" Description="תרגול מסכם ומשוב על מה שכדאי להמשיך לחזק." Href="/student/report" LinkText="לדוגמה של דוח משוב" />
+                </div>
+                <div class="sr-path-end">
+                    <strong>הדרך שלך ממשיכה מכאן.</strong>
+                    <p>עוד הזדמנויות לתרגל, בקצב שלך.</p>
+                </div>
+            </section>
+        </div>
+    </div>
+</RoleArea>
 
-@* מציגים את תוכן הדף רק למשתמש מחובר בתפקיד תלמיד. *@
-@if (Session.IsLoggedIn && Session.Role == UserRole.Student)
-{
-    <h1>ברוכים הבאים לאזור התלמיד</h1>
-}
-
-
-@code {
-    // בודקים הרשאה בעת פתיחת הדף.
-    protected override void OnInitialized()
-    {
-        // אורח מועבר לדף הכניסה.
-        if (!Session.IsLoggedIn)
-        {
-            Navigation.NavigateTo("/login");
-            return;
-        }
-
-        // משתמש מחובר שאינו תלמיד מועבר לדף אין הרשאה.
-        if (Session.Role != UserRole.Student)
-        {
-            Navigation.NavigateTo("/access-denied");
-            return;
-        }
-    }
-}

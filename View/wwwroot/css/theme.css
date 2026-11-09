@@ -1,0 +1,181 @@
+﻿.theme-toggle {
+    border: 1px solid var(--line);
+    background: var(--paper);
+    color: var(--ink);
+    border-radius: 2rem;
+    padding: .45rem .85rem;
+    white-space: nowrap;
+    font-weight: 600;
+}
+
+.theme-to-light, .site-theme[data-bs-theme="dark"] .theme-to-dark {
+    display: none;
+}
+
+.site-theme[data-bs-theme="dark"] .theme-to-light {
+    display: inline;
+}
+
+.site-theme[data-bs-theme="dark"] {
+    color-scheme: dark;
+    --paper: #101c20;
+    --ink: #edf5f1;
+    --muted: #bacbc7;
+    --line: #405758;
+    --mint: #a9e1bb;
+    --surface: #1b2c30;
+    --raised: #263c40;
+    --bs-body-bg: var(--paper);
+    --bs-body-color: var(--ink);
+    --bs-border-color: var(--line);
+    --bs-link-color: #a9e8ce;
+}
+
+[data-bs-theme="dark"] :is(.feature-card,.example-card,.auth-card,.sr-panel,.sr-summary,.sr-table-wrap,.skip-link) {
+    background: var(--surface);
+    color: var(--ink);
+    border-color: var(--line);
+}
+
+[data-bs-theme="dark"] :is(.path-section,.stage-notice,.example-tag,.auth-benefits li span,.sr-recording,.sr-demo-note,.sr-correction,.sr-report-intro,.example-card blockquote) {
+    background: var(--raised);
+    color: var(--ink);
+}
+
+[data-bs-theme="dark"] :is(.eyebrow,.hero-points,.card-keyword,.path-index,.value-strip b,.text-accent,.step-number,.auth-quote,.auth-quote em,.sr-kicker,.required-marker) {
+    color: #a5d9bf;
+}
+
+[data-bs-theme="dark"] .highlight-word {
+    background: linear-gradient(transparent 70%, #35685b 70%);
+}
+
+[data-bs-theme="dark"] :is(.teacher-section,.practice-preview) {
+    background: #153b3b;
+    color: #fff;
+}
+
+[data-bs-theme="dark"] .practice-preview {
+    box-shadow: 10px 12px 0 #203233;
+}
+
+[data-bs-theme="dark"] .preview-note {
+    background: #443e2c;
+    color: #fff4c9;
+}
+
+[data-bs-theme="dark"] .btn-primary {
+    --bs-btn-color: #102d28;
+    --bs-btn-bg: #a9dfc2;
+    --bs-btn-border-color: #a9dfc2;
+    --bs-btn-hover-color: #102d28;
+    --bs-btn-hover-bg: #c6f2d8;
+    --bs-btn-hover-border-color: #c6f2d8;
+    --bs-btn-active-color: #102d28;
+    --bs-btn-active-bg: #a9dfc2;
+    --bs-btn-disabled-color: #112d27;
+    --bs-btn-disabled-bg: #a7bdaf;
+}
+
+[data-bs-theme="dark"] .btn-outline-primary {
+    --bs-btn-color: #b8ebd1;
+    --bs-btn-hover-color: #102d28;
+    --bs-btn-hover-bg: #b8ebd1;
+    --bs-btn-active-color: #102d28;
+    --bs-btn-active-bg: #b8ebd1;
+    --bs-btn-border-color: #79a994;
+}
+
+[data-bs-theme="dark"] .btn-light {
+    color: #153b35;
+}
+
+[data-bs-theme="dark"] :is(.form-control,.form-select,.form-control:focus,.form-select:focus) {
+    color: var(--ink);
+    background-color: var(--surface);
+    border-color: #76948c;
+}
+
+[data-bs-theme="dark"] .form-control::placeholder {
+    color: #adbdb7;
+}
+
+[data-bs-theme="dark"] .sr-table {
+    --bs-table-bg: var(--surface);
+    --bs-table-color: var(--ink);
+}
+
+    [data-bs-theme="dark"] .sr-table thead th {
+        background: var(--raised);
+    }
+
+[data-bs-theme="dark"] .sr-badge {
+    background: #294b42;
+    color: #d3f5d7;
+}
+
+.site-theme[data-bs-theme="dark"] .sr-stop .sr-stop-card,
+.site-theme[data-bs-theme="dark"] .sr-stop.current .sr-stop-card,
+.site-theme[data-bs-theme="dark"] .sr-path-end {
+    background: #172a30;
+    color: var(--ink);
+    border-color: #64877f;
+}
+
+.site-theme[data-bs-theme="dark"] .sr-stop.current .sr-stop-card {
+    border-inline-start-color: #9ee8b8;
+}
+
+[data-bs-theme="dark"] .sr-stop.current .sr-badge {
+    background: #b9e8c3;
+    color: #163629;
+}
+
+[data-bs-theme="dark"] .brand img {
+    background-color: #bedfca;
+    border-radius: 50%;
+}
+
+[data-bs-theme="dark"] .sr-meadow {
+    background: linear-gradient(#243c36, #213c3b);
+}
+
+[data-bs-theme="dark"] .sr-forest {
+    background: linear-gradient(#213c3b, #1c333a);
+}
+
+[data-bs-theme="dark"] .sr-mountain {
+    background: linear-gradient(#1c333a, #27353f);
+}
+
+[data-bs-theme="dark"] .sr-landscape::after {
+    opacity: .16;
+}
+
+[data-bs-theme="dark"] .sr-zone-heading p {
+    color: var(--muted);
+}
+
+[data-bs-theme="dark"] .sr-marker {
+    background: var(--surface);
+    color: var(--ink);
+}
+
+[data-bs-theme="dark"] .sr-stop.current .sr-marker {
+    color: #14352d;
+}
+
+[data-bs-theme="dark"] .sr-stop.completed .sr-marker {
+    background: #214f41;
+}
+
+[data-bs-theme="dark"] #blazor-error-ui {
+    background: #413522;
+    color: #fff1bd;
+}
+
+.site-theme {
+    min-height: 100vh;
+    background-color: var(--paper);
+    color: var(--ink);
+}

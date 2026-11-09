@@ -1,0 +1,34 @@
+﻿@page "/student/assigned"
+<PageTitle>המסלול עם המורה | SpeakReady</PageTitle>
+
+<RoleArea AllowedRole="UserRole.Student">
+    <div class="sr-page container">
+        <InnerHeading Eyebrow="לומדים עם מורה" Title="הדרך שלך, עם הכוונה אישית." Description="כאן יופיעו השיעורים שהמורה שייך לך, לפי הסדר שקבע." />
+        <nav class="sr-toolbar" aria-label="ניווט תלמיד">
+            <a class="btn btn-outline-primary" href="/student">למסלול העצמאי לדוגמה</a>
+            <a class="sr-text-link" href="/student/report">לדוח האבחון</a>
+        </nav>
+        <p class="sr-demo-note">דוגמת עיצוב לתלמיד עם מורה. לא בוצע שיוך אמיתי.</p>
+        <div class="sr-journey">
+            <section class="sr-landscape sr-meadow" aria-label="שיעורים ששויכו לדוגמה">
+                <div class="sr-trail">
+                    <LessonStop Number="✓" State="completed" Status="הושלם לדוגמה" Title="קצת על עצמי" Description="שיעור ששויך על ידי המורה לדוגמה." />
+                    <LessonStop Number="2" State="current" Status="שיעור חדש מהמורה" Title="חוויה מהעבר" Description="המיקוד: זמן עבר והרחבת תשובה." />
+                </div>
+                <div class="sr-path-end">
+                    <strong>הדרך ממשיכה כאן</strong>
+                    <p>שיעורים נוספים יופיעו כשהמורה ישייך אותם.</p>
+                </div>
+            </section>
+        </div>
+        <details class="sr-panel mt-4">
+            <summary>איך ייראה המסך לפני שיוך השיעור הראשון?</summary>
+            <div class="sr-empty">
+                <h2>המסלול שלך מחכה לצעד הראשון</h2>
+                <p>המורה עדיין לא שייך לך שיעורים. אפשר להתחיל באבחון כדי להכיר את נקודת הפתיחה.</p>
+                <a class="btn btn-primary" href="/student/diagnostic">לאבחון לדוגמה</a>
+            </div>
+        </details>
+    </div>
+</RoleArea>
+

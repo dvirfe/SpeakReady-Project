@@ -1,40 +1,67 @@
 using DAL;
 using System.Text.Json.Serialization;
-
 var builder = WebApplication.CreateBuilder(args);
+// הגבלת הרצת השרת למחשב המקומי.
 builder.WebHost.UseUrls("http://localhost:5214");
-
-// הפרויקט פועל כרגע בסביבת פיתוח מקומית.
-// עדיין אין מערכת הרשאות מלאה לפעולות הניהול ב-API.
-// לא חושפים את פעולות הניהול באינטרנט לפני מימוש שכבת ההרשאות.
+// בדיקה שהפרויקט פועל בסביבת פיתוח.
 if (!builder.Environment.IsDevelopment())
-    throw new InvalidOperationException("This project runs in Development only.");
-var serverConnection = builder.Configuration.GetConnectionString("DefaultConnection");
+{
+    throw new InvalidOperationException(
+        "This project runs in Development only.");
+}
+// קבלת מחרוזת החיבור ל-MySQL מתוך הגדרות הפרויקט.
+string? serverConnection = builder.Configuration.GetConnectionString(
+    "DefaultConnection");
 if (string.IsNullOrWhiteSpace(serverConnection))
-    throw new InvalidOperationException("Set ConnectionStrings:DefaultConnection in API User Secrets. See README.");
-
-builder.Services.AddControllers().AddJsonOptions(options =>
-    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+{
+    throw new InvalidOperationException(
+        "Set ConnectionStrings:DefaultConnection in API User Secrets.");
+}
+// הגדרת השירותים שבהם משתמש ה-API.
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(
+            new JsonStringEnumConverter());
+    });
 builder.Services.AddOpenApi();
 builder.Services.AddProblemDetails();
-builder.Services.AddSingleton(new UserDB(DatabaseInitializer.GetDatabaseConnectionString(serverConnection)));
-
+// יצירת השירות שמבצע פעולות על טבלת המשתמשים.
+builder.Services.AddSingleton(
+    new UserDB(
+        DatabaseInitializer.GetDatabaseConnectionString(
+            serverConnection)));
 var app = builder.Build();
 app.UseExceptionHandler();
-
-// האתחול רץ לפני קבלת הבקשה הראשונה. כישלון חיבור עוצר את ההרצה.
+// בדיקה האם צריך ליצור משתמשי הדגמה.
 bool seed = builder.Configuration.GetValue<bool>("Seed:Enabled");
-var demoPassword = seed ? builder.Configuration["Seed:DemoPassword"] : null;
+string? demoPassword = null;
+if (seed)
+{
+    demoPassword = builder.Configuration["Seed:DemoPassword"];
+}
+// בדיקה שהוגדרה סיסמה למשתמשי ההדגמה.
 if (seed && string.IsNullOrEmpty(demoPassword))
-    throw new InvalidOperationException("Set Seed:DemoPassword in API User Secrets, or set Seed:Enabled=false.");
-
-await DatabaseInitializer.InitializeAsync(serverConnection, demoPassword);
+{
+    throw new InvalidOperationException(
+        "Set Seed:DemoPassword in API User Secrets, or set Seed:Enabled=false.");
+}
+// יצירת בסיס הנתונים והטבלאות במידת הצורך.
+await DatabaseInitializer.InitializeAsync(
+    serverConnection,
+    demoPassword);
+// הגדרת הנתיבים של ה-API.
 app.MapOpenApi();
 app.MapControllers();
-app.MapGet("/health", () => Results.Ok(new
+// נתיב לבדיקה שהשרת פועל.
+app.MapGet("/health", () =>
 {
-    status = "ready",
-    project = "SpeakReady",
-    stage = "V7"
-})); app.Run();
-
+    return Results.Ok(new
+    {
+        status = "ready",
+        project = "SpeakReady",
+        stage = "V7"
+    });
+});
+// הפעלת השרת.
+app.Run();

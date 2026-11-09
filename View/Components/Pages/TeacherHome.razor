@@ -1,31 +1,43 @@
 ﻿@page "/teacher"
-@using Model
-@using View.Services
-@inject UserSession Session
-@inject NavigationManager Navigation
+<PageTitle>אזור המורה | SpeakReady</PageTitle>
 
-<PageTitle>אזור מורה | SpeakReady</PageTitle>
+<RoleArea AllowedRole="UserRole.Teacher">
+    <div class="sr-page container">
+        <InnerHeading Eyebrow="מרחב ההוראה שלך" Title="רואים את התלמיד. מכוונים את הדרך." Description="תמונת מצב, מסלולי למידה ושיעורים במקום אחד." />
+        <p class="sr-demo-note">לוח מורה לדוגמה. המספרים והשמות אינם מידע ממסד הנתונים.</p>
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <SummaryCard Label="תלמידים בקבוצה" Value="12" Note="קבוצת דיבור באנגלית" />
+            </div>
+            <div class="col-md-4">
+                <SummaryCard Label="תרגולים לעיון" Value="4" Note="ממתינים למשוב המורה" />
+            </div>
+            <div class="col-md-4">
+                <SummaryCard Label="שיעורים בספרייה" Value="8" Note="לפי נושא ומיומנות" />
+            </div>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-6">
+                <article class="sr-panel h-100">
+                    <h2>התלמידים שלי</h2>
+                    <p>עיון בתמונת המצב של התלמידים ובמיקוד הלמידה שלהם.</p>
+                    <a class="btn btn-primary" href="/teacher/students">לרשימת התלמידים</a>
+                </article>
+            </div>
+            <div class="col-md-6">
+                <article class="sr-panel h-100">
+                    <h2>מכוונים את המסלול</h2>
+                    <p>בחירת שיעור מהספרייה ושיוך לתלמיד או לקבוצה.</p>
+                    <a class="btn btn-outline-primary" href="/teacher/lessons">לספריית השיעורים</a>
+                </article>
+            </div>
+        </div>
+        <article class="sr-panel mt-4">
+            <span class="sr-kicker">לתשומת לבך</span>
+            <h2>דוח אבחון חדש לדוגמה</h2>
+            <p>נועה לוי מתרגלת פיתוח תשובות. אפשר לעיין בדוח ולבחור שיעור המשך מתאים.</p>
+            <a class="sr-text-link" href="/teacher/report">צפייה בדוח לדוגמה</a>
+        </article>
+    </div>
+</RoleArea>
 
-@* התוכן מוצג רק למשתמש מחובר בתפקיד מורה. *@
-@if (Session.IsLoggedIn && Session.Role == UserRole.Teacher)
-{
-    <h1>ברוכים הבאים לאזור המורה</h1>
-}
-
-@code {
-    // בודקים התחברות ותפקיד בעת פתיחת הדף.
-    protected override void OnInitialized()
-    {
-        if (!Session.IsLoggedIn)
-        {
-            Navigation.NavigateTo("/login");
-            return;
-        }
-
-        if (Session.Role != UserRole.Teacher)
-        {
-            Navigation.NavigateTo("/access-denied");
-            return;
-        }
-    }
-}

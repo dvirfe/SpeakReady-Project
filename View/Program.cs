@@ -1,7 +1,6 @@
 using View.Components;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents().AddInteractiveServerComponents();
-// התצוגה תשתמש ב-HTTP בשלב הבא. אין הפניה ל-DAL ואין חיבור למסד כאן.
 builder.Services.AddHttpClient("SpeakReadyAPI", client =>
     client.BaseAddress = new Uri(builder.Configuration["ApiBaseUrl"] ?? "http://localhost:5214"));
 string apiBaseUrl = builder.Configuration["ApiBaseUrl"]

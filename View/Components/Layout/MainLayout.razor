@@ -3,6 +3,7 @@
 @inject UserSession Session
 @inject NavigationManager Navigation
 
+<div class="site-theme" data-bs-theme="@(isDarkMode ? "dark" : null)">
 <a class="skip-link" href="#main-content">דילוג לתוכן</a>
 
 <header class="site-header">
@@ -20,6 +21,10 @@
         </div>
 
         <div class="d-flex align-items-center gap-2">
+
+            <button type="button" class="theme-toggle" @onclick="ToggleTheme">
+                @(isDarkMode ? "מעבר למצב בהיר" : "מעבר למצב כהה")
+            </button>
 
             @if (Session.IsLoggedIn)
             {
@@ -82,8 +87,14 @@
     <a href="" class="reload">טעינה מחדש</a>
     <button class="dismiss" aria-label="סגירת ההודעה">×</button>
 </div>
-
+</div>  
 @code {
+    private bool isDarkMode = false;
+
+    private void ToggleTheme()
+    {
+        isDarkMode = !isDarkMode;
+    }
     protected override void OnInitialized()
     {
         Session.OnChange += OnSessionChanged;

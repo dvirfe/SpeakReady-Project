@@ -1,0 +1,13 @@
+@* כותרת אחידה לדפים הפנימיים של תלמיד, מורה ומנהל. *@
+<header class="sr-heading">
+    <span class="sr-kicker">@Eyebrow</span>
+    <h1>@Title</h1>
+    <p>@Description</p>
+</header>
+
+@code {
+    [Parameter] public string Eyebrow { get; set; } = "SpeakReady";
+    [Parameter] public string Title { get; set; } = string.Empty;
+    [Parameter] public string Description { get; set; } = string.Empty;
+}
+
