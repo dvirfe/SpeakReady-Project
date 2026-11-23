@@ -143,7 +143,17 @@ public class UserDB(string connectionString)
         using var command = new MySqlCommand(sql, connection);
         command.Parameters.AddWithValue("@id", id);
         command.Parameters.AddWithValue("@value", value);
-        try { return await command.ExecuteNonQueryAsync() > 0; }
+        try
+        {
+            using var transaction = await connection.BeginTransactionAsync();
+            command.Transaction = transaction;
+            var changed = await command.ExecuteNonQueryAsync() > 0;
+            using var revoke = new MySqlCommand("DELETE FROM AuthSessions WHERE UserId=@id", connection, transaction);
+            revoke.Parameters.AddWithValue("@id", id);
+            await revoke.ExecuteNonQueryAsync();
+            await transaction.CommitAsync();
+            return changed;
+        }
         catch (MySqlException ex) when (ex.Number == 1062) { throw new DuplicateUserException(ex); }
     }
 }

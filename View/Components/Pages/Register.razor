@@ -1,5 +1,6 @@
 @page "/register"
 @rendermode @(new Microsoft.AspNetCore.Components.Web.InteractiveServerRenderMode(prerender: false))
+@using Model
 @using System.Net.Http.Json
 @using System.Net.Mail
 @using System.Text.Json
@@ -87,7 +88,7 @@
                                        Type="password"
                                        Dir="ltr"
                                        Autocomplete="new-password"
-                                       MaxLength="128"
+                                       MaxLength="72"
                                        @bind-Value="password" />
 
                                 <Field Id="reg-confirm"
@@ -95,7 +96,7 @@
                                        Type="password"
                                        Dir="ltr"
                                        Autocomplete="new-password"
-                                       MaxLength="128"
+                                       MaxLength="72"
                                        @bind-Value="confirmPassword" />
 
                                 <button type="button"
@@ -169,6 +170,10 @@
             return;
         }
 
+        var validation = UserValidation.Validate(new CreateUserRequest {
+            Username = cleanUsername, FullName = cleanFullName, Email = cleanEmail, Password = password
+        });
+        if (validation is not null) { errorMessage = validation; return; }
         isBusy = true;
         CancellationToken token = cancellation.Token;
 

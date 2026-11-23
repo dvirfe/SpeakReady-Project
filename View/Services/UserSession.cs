@@ -1,45 +1,26 @@
-﻿
+using Microsoft.AspNetCore.Components.Authorization;
 using Model;
 
 namespace View.Services;
 
-public class UserSession
+// A UI projection only. Every API operation independently validates the session and owner.
+public sealed class UserSession(AuthenticationStateProvider authentication)
 {
     public int UserId { get; private set; }
-    public string Username { get; private set; } = string.Empty;
-    public string FullName { get; private set; } = string.Empty;
-    public string Email { get; private set; } = string.Empty;
+    public string Username { get; private set; } = "";
+    public string FullName { get; private set; } = "";
+    public string Email { get; private set; } = "";
     public UserRole Role { get; private set; }
-
     public bool IsLoggedIn => UserId > 0;
-
     public event Action? OnChange;
-
-    public void Login(User user)
+    public async Task InitializeAsync()
     {
-        UserId = user.Id;
-        Username = user.Username;
-        FullName = user.FullName;
-        Email = user.Email;
-        Role = user.Role;
-
-        if (OnChange != null)
-        {
-            OnChange.Invoke();
-        }
-    }
-
-    public void Logout()
-    {
-        UserId = 0;
-        Username = string.Empty;
-        FullName = string.Empty;
-        Email = string.Empty;
-        Role = default;
-
-        if (OnChange != null)
-        {
-            OnChange.Invoke();
-        }
+        var user = (await authentication.GetAuthenticationStateAsync()).User;
+        UserId = int.TryParse(user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value, out var id) ? id : 0;
+        Username = user.Identity?.Name ?? "";
+        FullName = user.FindFirst("full_name")?.Value ?? "";
+        Email = user.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value ?? "";
+        Role = Enum.TryParse<UserRole>(user.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value, out var role) ? role : default;
+        OnChange?.Invoke();
     }
 }

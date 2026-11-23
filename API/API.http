@@ -1,144 +1,34 @@
-@SpeakReady_HostAddress = http://localhost:5214
-# בוחרים את סיסמת ההדגמה בעצמכם ב-User Secrets.
-# אין לשמור כאן סיסמה אמיתית. לבדיקת login אפשר להשתמש במשתמש החדש שנוצר בהמשך.
-@testId = 11
+@baseUrl = http://localhost:5214
+# After login, copy token from the response into the variable below (never commit a real token).
+@token = REPLACE_WITH_SESSION_TOKEN
 
-### 200: השרת עלה והאתחול הסתיים
-GET {{SpeakReady_HostAddress}}/health
-
-### 200: בהרצה ראשונה 10 משתמשים; אין PasswordHash בתשובה
-GET {{SpeakReady_HostAddress}}/api/users
-
-### 200: משתמש קיים
-GET {{SpeakReady_HostAddress}}/api/users/1
-
-### 404: מזהה שלא קיים
-GET {{SpeakReady_HostAddress}}/api/users/2147483647
-
-### 200 + true
-GET {{SpeakReady_HostAddress}}/api/users/username-exists?username=admin
-
-### 200 + false
-GET {{SpeakReady_HostAddress}}/api/users/username-exists?username=not_created_yet_987
-
-### 200 + true
-GET {{SpeakReady_HostAddress}}/api/users/email-exists?email=admin%40speakready.example
-
-### 200: בתחילה Admin=1, Teacher=2, Student=7
-GET {{SpeakReady_HostAddress}}/api/users/count-by-role
-
-### 201: הוספת משתמש בדיקה. מעתיקים את id מהתשובה אל testId בראש הקובץ.
-# השדות כאן הם נתוני הדגמה ציבוריים בלבד.
-POST {{SpeakReady_HostAddress}}/api/users
+### Register student
+POST {{baseUrl}}/api/users
 Content-Type: application/json
 
-{
-  "username": "api_test",
-  "fullName": "משתמש בדיקה",
-  "email": "api_test@speakready.example",
-  "password": "Demo-Only-123!"
-}
+{"username":"pilot-student","fullName":"Pilot Student","email":"pilot@example.com","password":"Choose-a-new-password"}
 
-### 409: שליחת אותה בקשת הוספה שוב
-POST {{SpeakReady_HostAddress}}/api/users
+### Login
+POST {{baseUrl}}/api/users/login
 Content-Type: application/json
 
-{
-  "username": "api_test",
-  "fullName": "כפילות",
-  "email": "different@speakready.example",
-  "password": "Demo-Only-123!"
-}
+{"username":"pilot-student","password":"Choose-a-new-password"}
 
-### 400: מידע לא תקין
-POST {{SpeakReady_HostAddress}}/api/users
-Content-Type: application/json
+### Session
+GET {{baseUrl}}/api/users/me
+Authorization: Bearer {{token}}
 
-{
-  "username": "a",
-  "fullName": "",
-  "email": "invalid",
-  "password": "x"
-}
+### Exercises
+GET {{baseUrl}}/api/practice/exercises
+Authorization: Bearer {{token}}
 
-### 200: בדיקת פרטי כניסה בלבד, ללא cookie או session
-POST {{SpeakReady_HostAddress}}/api/users/login
-Content-Type: application/json
+### History and quota
+GET {{baseUrl}}/api/practice/history
+Authorization: Bearer {{token}}
 
-{"username":"api_test","password":"Demo-Only-123!"}
+### Logout (revokes token)
+POST {{baseUrl}}/api/users/logout
+Authorization: Bearer {{token}}
 
-### 401: סיסמה שגויה, גם שינוי אות גדולה לקטנה משמעותי
-POST {{SpeakReady_HostAddress}}/api/users/login
-Content-Type: application/json
-
-{"username":"api_test","password":"demo-only-123!"}
-
-### 204: עדכון תפקיד למשתמש הבדיקה בלבד
-PUT {{SpeakReady_HostAddress}}/api/users/{{testId}}/role
-Content-Type: application/json
-
-{"role":"Teacher"}
-
-### 400: תפקיד שאינו קיים
-PUT {{SpeakReady_HostAddress}}/api/users/{{testId}}/role
-Content-Type: application/json
-
-{"role":99}
-
-### 204: עדכון אימייל
-PUT {{SpeakReady_HostAddress}}/api/users/{{testId}}/email
-Content-Type: application/json
-
-{"email":"api_test_updated@speakready.example"}
-
-### 409: אימייל שכבר קיים
-PUT {{SpeakReady_HostAddress}}/api/users/{{testId}}/email
-Content-Type: application/json
-
-{"email":"admin@speakready.example"}
-
-### 204: עדכון סיסמה
-PUT {{SpeakReady_HostAddress}}/api/users/{{testId}}/password
-Content-Type: application/json
-
-{"password":"Updated-Demo-123!"}
-
-### 401: הסיסמה הישנה לא עובדת
-POST {{SpeakReady_HostAddress}}/api/users/login
-Content-Type: application/json
-
-{"username":"api_test","password":"Demo-Only-123!"}
-
-### 200: הסיסמה החדשה עובדת
-POST {{SpeakReady_HostAddress}}/api/users/login
-Content-Type: application/json
-
-{"username":"api_test","password":"Updated-Demo-123!"}
-
-### 204: השבתה ללא מחיקה
-PUT {{SpeakReady_HostAddress}}/api/users/{{testId}}/active
-Content-Type: application/json
-
-{"isActive":false}
-
-### 401: משתמש לא פעיל אינו מתחבר
-POST {{SpeakReady_HostAddress}}/api/users/login
-Content-Type: application/json
-
-{"username":"api_test","password":"Updated-Demo-123!"}
-
-### 200: ההיסטוריה ורשומת המשתמש עדיין קיימות
-GET {{SpeakReady_HostAddress}}/api/users/{{testId}}
-
-### 204: החזרה לפעילות
-PUT {{SpeakReady_HostAddress}}/api/users/{{testId}}/active
-Content-Type: application/json
-
-{"isActive":true}
-
-### 404: עדכון משתמש שלא קיים
-PUT {{SpeakReady_HostAddress}}/api/users/2147483647/email
-Content-Type: application/json
-
-{"email":"nobody@speakready.example"}
-
+### Must be 401 without authentication
+GET {{baseUrl}}/api/users

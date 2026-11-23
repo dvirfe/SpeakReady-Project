@@ -17,7 +17,7 @@
         <div class="nav-links d-none d-lg-flex gap-4">
             <a href="/#how-it-works">איך זה עובד</a>
             <a href="/#learning-path">מסלול הלמידה</a>
-            <a href="/#teachers">למורים</a>
+            <a href="/privacy">פרטיות והקלטות</a>
         </div>
 
         <div class="d-flex align-items-center gap-2">
@@ -34,21 +34,20 @@
                 }
                 else if (Session.Role == Model.UserRole.Teacher)
                 {
-                    <a class="login-link" href="/teacher">אזור מורה</a>
+                    <a class="login-link" href="/pilot-info">אזור מורה</a>
                 }
                 else if (Session.Role == Model.UserRole.Admin)
                 {
-                    <a class="login-link" href="/admin">אזור מנהל</a>
+                    <a class="login-link" href="/pilot-info">אזור מנהל</a>
                 }
                 <span class="fw-semibold">
                     שלום, @Session.Username
                 </span>
 
-                <button type="button"
-                        class="btn btn-outline-primary"
-                        @onclick="Logout">
-                    התנתקות
-                </button>
+                <form method="post" action="/account/logout" data-enhance="false">
+                    <AntiforgeryToken />
+                    <button type="submit" class="btn btn-outline-primary">התנתקות</button>
+                </form>
             }
             else
             {
@@ -95,20 +94,15 @@
     {
         isDarkMode = !isDarkMode;
     }
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         Session.OnChange += OnSessionChanged;
+        await Session.InitializeAsync();
     }
 
     private void OnSessionChanged()
     {
         _ = InvokeAsync(StateHasChanged);
-    }
-
-    private void Logout()
-    {
-        Session.Logout();
-        Navigation.NavigateTo("/");
     }
 
     public void Dispose()

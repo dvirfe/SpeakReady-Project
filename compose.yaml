@@ -1,0 +1,64 @@
+services:
+  db:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: SpeakReadyDB
+      MYSQL_USER: speakready
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:?Set MYSQL_PASSWORD}
+    volumes:
+      - database:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "MYSQL_PWD=$$MYSQL_PASSWORD mysql -u speakready -e 'SELECT 1' SpeakReadyDB"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+  api:
+    build:
+      context: .
+      dockerfile: API/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__DefaultConnection: Server=db;Database=SpeakReadyDB;User ID=speakready;Password=${MYSQL_PASSWORD};SslMode=Preferred
+      OpenAI__ApiKey: ${OPENAI_API_KEY:-}
+      OpenAI__TranscriptionModel: ${TRANSCRIPTION_MODEL:-gpt-4o-mini-transcribe}
+      OpenAI__FeedbackModel: ${FEEDBACK_MODEL:-gpt-4.1-mini}
+      Practice__DailyLimit: 5
+    volumes:
+      - audio:/data/audio
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+  view:
+    build:
+      context: .
+      dockerfile: View/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ApiBaseUrl: http://api:8080
+    volumes:
+      - keys:/data/keys
+    depends_on:
+      - api
+    restart: unless-stopped
+  proxy:
+    image: caddy:2
+    environment:
+      SITE_DOMAIN: ${SITE_DOMAIN:?Set SITE_DOMAIN to your domain}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - view
+    restart: unless-stopped
+volumes:
+  database:
+  audio:
+  keys:
+  caddy-data:
+  caddy-config:

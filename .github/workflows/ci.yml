@@ -1,0 +1,24 @@
+name: Build and test
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: test-password
+        ports: ["3306:3306"]
+        options: >-
+          --health-cmd="mysqladmin ping -ptest-password"
+          --health-interval=10s --health-timeout=5s --health-retries=20
+    env:
+      SPEAKREADY_TEST_DB: Server=127.0.0.1;Port=3306;User ID=root;Password=test-password;SslMode=Required
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - run: sudo apt-get update && sudo apt-get install -y ffmpeg
+      - run: dotnet build SpeakReady.sln --configuration Release
+      - run: dotnet test tests/SpeakReady.Tests/SpeakReady.Tests.csproj --configuration Release

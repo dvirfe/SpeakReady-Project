@@ -45,8 +45,8 @@ public static class DatabaseInitializer
 
         if (!string.IsNullOrEmpty(demoPassword))
         {
-            if (demoPassword.Length < 8)
-                throw new InvalidOperationException("Seed:DemoPassword must have at least 8 characters.");
+            if (demoPassword.Length < 8 || System.Text.Encoding.UTF8.GetByteCount(demoPassword) > 72)
+                throw new InvalidOperationException("Seed:DemoPassword must have at least 8 characters and at most 72 UTF-8 bytes.");
             await SeedUsersAsync(connection, demoPassword);
         }
     }

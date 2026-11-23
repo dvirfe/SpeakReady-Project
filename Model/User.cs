@@ -4,11 +4,11 @@ namespace Model;
 
 public class User : BaseEntity
 {
-    public string Username { get; set; }
-    public string FullName { get; set; }
-    public string Email { get; set; }
+    public string Username { get; set; } = "";
+    public string FullName { get; set; } = "";
+    public string Email { get; set; } = "";
     [JsonIgnore] 
-    public string PasswordHash { get; set; }
+    public string PasswordHash { get; set; } = "";
     public UserRole Role { get; set; }
     public string RoleName
     {
