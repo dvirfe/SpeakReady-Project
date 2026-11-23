@@ -1,0 +1,79 @@
+@using Microsoft.JSInterop
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+@inject NavigationManager Navigation
+<div class="sr-panel" id="@id">
+    <AntiforgeryToken />
+    <h2>התשובה שלך</h2>
+    <p>עד @MaxSeconds שניות. אפשר להאזין ולהקליט מחדש לפני השליחה.</p>
+    <p role="status" aria-live="polite">@(recording ? $"מקליטים · {seconds} שניות" : preview is null ? "מוכנים כשאתם מוכנים." : "ההקלטה מוכנה להאזנה.")</p>
+    <div class="d-flex flex-wrap gap-2">
+        <button class="btn btn-primary" type="button" disabled="@(busy || recording || !supported)" @onclick="Start">@(preview is null ? "התחלת הקלטה" : "הקלטה מחדש")</button>
+        <button class="btn btn-outline-primary" type="button" disabled="@(!recording)" @onclick="Stop">עצירה</button>
+    </div>
+    @if (preview is not null)
+    {
+        <audio class="w-100 mt-3" src="@preview" controls aria-label="האזנה לפני שליחה"></audio>
+        <div class="form-check mt-3">
+            <input id="@(id + "-consent")" class="form-check-input" type="checkbox" @bind="consent" disabled="@busy" />
+            <label class="form-check-label" for="@(id + "-consent")">אני מאשר/ת שמירת ההקלטה ושליחתה ל־OpenAI לתמלול ומשוב. <a href="/privacy" target="_blank" rel="noopener">פרטיות והקלטות</a></label>
+        </div>
+        <button class="btn btn-primary mt-3" type="button" disabled="@(busy || !consent || recording)" @onclick="Submit">@(busy ? "שולחים..." : "שליחה לקבלת משוב")</button>
+    }
+    @if (error is not null) { <p class="alert alert-warning mt-3" role="alert">@error</p> }
+</div>
+@code {
+    [Parameter] public int ExerciseId { get; set; }
+    [Parameter] public int MaxSeconds { get; set; } = 120;
+    private readonly string id = "recorder-" + Guid.NewGuid().ToString("N");
+    private IJSObjectReference? module;
+    private DotNetObjectReference<AudioRecorder>? reference;
+    private bool recording, busy, consent, supported;
+    private int seconds;
+    private string? preview, error;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/recorder.js");
+        reference = DotNetObjectReference.Create(this);
+        supported = await module.InvokeAsync<bool>("supported");
+        if (!supported) error = "הקלטה דורשת דפדפן עדכני וחיבור HTTPS (או localhost בפיתוח).";
+        StateHasChanged();
+    }
+    private async Task Start()
+    {
+        if (module is null) return;
+        error = null; preview = null; consent = false; seconds = 0; busy = true;
+        try { await module.InvokeVoidAsync("start", id, reference, Math.Min(MaxSeconds, 120)); recording = true; }
+        catch (JSException) { error = "לא ניתן להפעיל מיקרופון. בדקו הרשאות בדפדפן ונסו שוב."; }
+        finally { busy = false; }
+    }
+    private async Task Stop() { if (module is not null) await module.InvokeVoidAsync("stop", id); }
+    [JSInvokable] public Task RecordingTick(int value) { seconds = value; return InvokeAsync(StateHasChanged); }
+    [JSInvokable] public Task RecordingReady(string url, int duration) { preview = url; seconds = duration; recording = false; return InvokeAsync(StateHasChanged); }
+    [JSInvokable] public Task RecordingError(string message) { error = message; recording = false; return InvokeAsync(StateHasChanged); }
+    private sealed record UploadResult(bool Ok, int Id, string? Message);
+    private async Task Submit()
+    {
+        if (module is null || !consent || busy) return;
+        busy = true; error = null;
+        try
+        {
+            var token = await module.InvokeAsync<string>("csrf", id);
+            var result = await module.InvokeAsync<UploadResult>("upload", id, ExerciseId, token);
+            if (result.Ok) Navigation.NavigateTo($"/student/report/{result.Id}");
+            else error = result.Message;
+        }
+        catch (JSException) { error = "השליחה לא הושלמה. נסו שוב."; }
+        finally { busy = false; }
+    }
+    public async ValueTask DisposeAsync()
+    {
+        if (module is not null)
+        {
+            try { await module.InvokeVoidAsync("dispose", id); await module.DisposeAsync(); }
+            catch (JSDisconnectedException) { }
+        }
+        reference?.Dispose();
+    }
+}

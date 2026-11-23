@@ -1,38 +1,27 @@
-﻿@page "/student/lesson"
-<PageTitle>תרגול דיבור | SpeakReady</PageTitle>
-
+@page "/student/practice/{ExerciseId:int}"
+@inject ApiClient Api
+<PageTitle>תרגול | SpeakReady</PageTitle>
 <RoleArea AllowedRole="UserRole.Student">
-    <div class="sr-page container">
-        <InnerHeading Eyebrow="מספרים על חוויה" Title="סיפור קטן, צעד גדול." Description="המיקוד בשיעור: זמן עבר ותשובה הכוללת סיבה ודוגמה." />
-        <p class="sr-demo-note">תרגול אחד לדוגמה לכל תחנות המסלול. אין הקלטה, שמירה או סימון השלמה.</p>
-        <div class="row g-4">
-            <div class="col-lg-8">
-                <article class="sr-panel sr-question">
-                    <span class="sr-badge">תרגול דיבור · כ־5 דקות</span>
-                    <h2 lang="en" dir="ltr">Describe a day you enjoyed recently. What made it special?</h2>
-                    <p>ספר איפה היית, מה עשית ולמה היום הזה היה מיוחד.</p>
-                    <div class="sr-recording">
-                        <span class="sr-mic" aria-hidden="true">●</span>
-                        <p>מוכנים לדבר?</p>
-                        <button class="btn btn-primary" type="button" disabled>הקלטת תשובה</button>
-                        <p class="small mt-2">ההקלטה תהיה זמינה בהמשך.</p>
-                    </div>
-                    <a class="sr-text-link mt-4 d-inline-block" href="/student/report">כך ייראה משוב לדוגמה</a>
-                </article>
-            </div>
-            <div class="col-lg-4">
-                <aside class="sr-panel">
-                    <h2>עזרה בדרך</h2>
-                    <p>חשוב על שלושה חלקים: מה קרה, איך הרגשת ולמה.</p>
-                    <ul class="sr-list" dir="ltr" lang="en">
-                        <li>Last weekend, I…</li>
-                        <li>I enjoyed it because…</li>
-                        <li>For example…</li>
-                    </ul>
-                    <a class="sr-text-link" href="/student">חזרה למסלול</a>
-                </aside>
-            </div>
-        </div>
+    <div class="container py-5">
+        <a href="/student">חזרה לתרגילים ולהיסטוריה</a>
+        @if (error is not null) { <p class="alert alert-warning mt-3" role="alert">@error</p> }
+        else if (exercise is null) { <p role="status">טוענים את התרגיל...</p> }
+        else
+        {
+            <InnerHeading Eyebrow="מקום לקול שלך" Title="@exercise.Title" Description="@exercise.Instructions" />
+            <article class="sr-panel mb-4"><h2 lang="en" dir="ltr">@exercise.PromptText</h2></article>
+            <AudioRecorder @key="ExerciseId" ExerciseId="ExerciseId" MaxSeconds="exercise.MaxSeconds" />
+        }
     </div>
 </RoleArea>
-
+@code {
+    [Parameter] public int ExerciseId { get; set; }
+    private ExerciseSummary? exercise;
+    private string? error;
+    protected override async Task OnParametersSetAsync()
+    {
+        error = null; exercise = null;
+        try { exercise = (await Api.GetAsync<List<ExerciseSummary>>("api/practice/exercises"))?.Find(e => e.Id == ExerciseId); if (exercise is null) error = "התרגיל לא נמצא."; }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException) { error = "לא ניתן לטעון את התרגיל. נסו שוב או התחברו מחדש."; }
+    }
+}

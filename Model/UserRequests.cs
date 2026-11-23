@@ -21,7 +21,8 @@ public class CreateUserRequest
     public string Email { get; set; } = "";
 
     [Required]
-    [StringLength(128, MinimumLength = 8)]
+    [StringLength(72, MinimumLength = 8)]
+    [PasswordBytes]
     public string Password { get; set; } = "";
 }
 
@@ -33,7 +34,8 @@ public class LoginRequest
     public string Username { get; set; } = "";
 
     [Required]
-    [StringLength(128)]
+    [StringLength(72)]
+    [PasswordBytes]
     public string Password { get; set; } = "";
 }
 
@@ -50,7 +52,8 @@ public class UpdateEmailRequest
 public class UpdatePasswordRequest
 {
     [Required]
-    [StringLength(128, MinimumLength = 8)]
+    [StringLength(72, MinimumLength = 8)]
+    [PasswordBytes]
     public string Password { get; set; } = "";
 }
 

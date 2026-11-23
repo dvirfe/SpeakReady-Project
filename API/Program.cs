@@ -1,67 +1,48 @@
+using API.Authentication;
+using API.Services;
 using DAL;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.RateLimiting;
 using System.Text.Json.Serialization;
+using System.Threading.RateLimiting;
+
 var builder = WebApplication.CreateBuilder(args);
-// הגבלת הרצת השרת למחשב המקומי.
-builder.WebHost.UseUrls("http://localhost:5214");
-// בדיקה שהפרויקט פועל בסביבת פיתוח.
-if (!builder.Environment.IsDevelopment())
-{
-    throw new InvalidOperationException(
-        "This project runs in Development only.");
-}
-// קבלת מחרוזת החיבור ל-MySQL מתוך הגדרות הפרויקט.
-string? serverConnection = builder.Configuration.GetConnectionString(
-    "DefaultConnection");
-if (string.IsNullOrWhiteSpace(serverConnection))
-{
-    throw new InvalidOperationException(
-        "Set ConnectionStrings:DefaultConnection in API User Secrets.");
-}
-// הגדרת השירותים שבהם משתמש ה-API.
-builder.Services.AddControllers()
-    .AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.Converters.Add(
-            new JsonStringEnumConverter());
-    });
+string connection = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException("Set ConnectionStrings:DefaultConnection in API User Secrets or environment variables.");
+string databaseConnection = DatabaseInitializer.GetDatabaseConnectionString(connection);
+builder.Services.AddControllers().AddJsonOptions(o => o.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 builder.Services.AddOpenApi();
 builder.Services.AddProblemDetails();
-// יצירת השירות שמבצע פעולות על טבלת המשתמשים.
-builder.Services.AddSingleton(
-    new UserDB(
-        DatabaseInitializer.GetDatabaseConnectionString(
-            serverConnection)));
+builder.Services.AddSingleton(new UserDB(databaseConnection));
+builder.Services.AddSingleton(sp => new SessionDB(databaseConnection, sp.GetRequiredService<UserDB>()));
+builder.Services.AddSingleton(new PracticeDB(databaseConnection));
+builder.Services.AddSingleton<PrivateAudioStore>();
+builder.Services.AddAuthentication("Session").AddScheme<AuthenticationSchemeOptions, SessionAuthenticationHandler>("Session", null);
+builder.Services.AddAuthorization();
+builder.Services.AddRateLimiter(options => {
+    options.RejectionStatusCode = 429;
+    options.AddFixedWindowLimiter("accounts", limit => { limit.PermitLimit = 60; limit.Window = TimeSpan.FromMinutes(1); limit.QueueLimit = 0; });
+});
+builder.Services.AddHttpClient<ISpeechFeedbackService, OpenAiFeedbackService>(http => {
+    http.BaseAddress = new Uri("https://api.openai.com/v1/");
+    http.Timeout = TimeSpan.FromMinutes(2);
+});
+builder.Services.AddHostedService<AnalysisWorker>();
 var app = builder.Build();
 app.UseExceptionHandler();
-// בדיקה האם צריך ליצור משתמשי הדגמה.
-bool seed = builder.Configuration.GetValue<bool>("Seed:Enabled");
-string? demoPassword = null;
-if (seed)
-{
-    demoPassword = builder.Configuration["Seed:DemoPassword"];
-}
-// בדיקה שהוגדרה סיסמה למשתמשי ההדגמה.
-if (seed && string.IsNullOrEmpty(demoPassword))
-{
-    throw new InvalidOperationException(
-        "Set Seed:DemoPassword in API User Secrets, or set Seed:Enabled=false.");
-}
-// יצירת בסיס הנתונים והטבלאות במידת הצורך.
-await DatabaseInitializer.InitializeAsync(
-    serverConnection,
-    demoPassword);
-// הגדרת הנתיבים של ה-API.
-app.MapOpenApi();
+app.UseRateLimiter();
+app.UseAuthentication();
+app.UseAuthorization();
+bool seed = app.Environment.IsDevelopment() && builder.Configuration.GetValue<bool>("Seed:Enabled");
+string? demoPassword = seed ? builder.Configuration["Seed:DemoPassword"] : null;
+if (seed && string.IsNullOrEmpty(demoPassword)) throw new InvalidOperationException("Set Seed:DemoPassword or disable Seed:Enabled.");
+app.Logger.LogInformation("Initializing database schema");
+await DatabaseInitializer.InitializeAsync(connection, demoPassword);
+await app.Services.GetRequiredService<PracticeDB>().SeedContentAsync();
+app.Logger.LogInformation("Database and pilot content ready");
+if (app.Environment.IsDevelopment()) app.MapOpenApi();
 app.MapControllers();
-// נתיב לבדיקה שהשרת פועל.
-app.MapGet("/health", () =>
-{
-    return Results.Ok(new
-    {
-        status = "ready",
-        project = "SpeakReady",
-        stage = "V7"
-    });
-});
-// הפעלת השרת.
+app.MapGet("/health", () => Results.Ok(new { status = "ready", project = "SpeakReady" }));
 app.Run();
+
+public partial class Program { }

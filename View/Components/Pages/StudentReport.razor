@@ -1,15 +1,99 @@
-﻿@page "/student/report"
-<PageTitle>תמונת המצב שלי | SpeakReady</PageTitle>
-
+@page "/student/report/{AttemptId:int}"
+@implements IDisposable
+@inject ApiClient Api
+@inject NavigationManager Navigation
+<PageTitle>המשוב שלי | SpeakReady</PageTitle>
 <RoleArea AllowedRole="UserRole.Student">
-    <div class="sr-page container">
-        <InnerHeading Eyebrow="עוצרים, מבינים ומתקדמים" Title="תמונת המצב שלך." Description="מה כבר עובד טוב ומה כדאי לתרגל בצעד הבא." />
-        <p class="sr-demo-note">כל תוכן הדוח מומצא לצורך העיצוב. הוא אינו תוצאה של אבחון שלך או ניתוח AI.</p>
-        <FeedbackReport />
-        <nav class="sr-toolbar mt-4" aria-label="המשך אחרי הדוח">
-            <a class="btn btn-primary" href="/student#next-lesson">למסלול התרגול</a>
-            <a class="btn btn-outline-primary" href="/student/diagnostic">למסך האבחון</a>
-        </nav>
+    <div class="container py-5">
+        <a href="/student">חזרה לתרגילים ולהיסטוריה</a>
+        @if (error is not null) { <p class="alert alert-warning mt-3" role="alert">@error</p> }
+        @if (attempt is not null)
+        {
+            <InnerHeading Eyebrow="לומדים מהניסיון" Title="@attempt.Title" Description="משוב לימודי על התשובה שלך" />
+            <p role="status" aria-live="polite">@attempt.AnalysisStatus.ToHebrew()</p>
+            <audio controls class="w-100 mb-4" src="@($"/practice/audio/{AttemptId}")" aria-label="ההקלטה שלי"></audio>
+            @if (attempt.AnalysisStatus is AnalysisState.Pending or AnalysisState.Processing)
+            { <p>ההקלטה נשמרה. אפשר לצאת מהעמוד ולחזור דרך ההיסטוריה; אין צורך לשלוח שוב.</p> }
+            @if (attempt.Error is not null) { <p class="alert alert-warning">@attempt.Error</p> }
+            @if (attempt.AnalysisStatus == AnalysisState.Failed && attempt.RetryCount < 2)
+            { <button class="btn btn-primary" disabled="@busy" @onclick="Retry">ניסיון ניתוח נוסף (נכלל במכסה היומית)</button> }
+            @if (attempt.Transcript is not null)
+            { <article class="sr-panel mb-3"><h2>התמלול</h2><p lang="en" dir="ltr">@attempt.Transcript</p><p class="small">התמלול אוטומטי ועשוי לכלול טעויות.</p></article> }
+            @if (attempt.Feedback is { } feedback)
+            {
+                <div class="row g-3">
+                    <div class="col-md-6"><article class="sr-panel h-100"><h2>מה עבד טוב?</h2><ul>@foreach (var item in feedback.Strengths) { <li>@item</li> }</ul></article></div>
+                    <div class="col-md-6"><article class="sr-panel h-100"><h2>מה אפשר לשפר?</h2><ul>@foreach (var item in feedback.Improvements) { <li>@item</li> }</ul></article></div>
+                </div>
+                @foreach (var correction in feedback.Corrections)
+                {
+                    <article class="sr-panel mt-3"><h3 class="h5">לומדים מתוך התשובה</h3>
+                        <p lang="en" dir="ltr"><strong>Original:</strong> @correction.Original</p>
+                        <p lang="en" dir="ltr"><strong>Try this:</strong> @correction.Improved</p><p>@correction.Explanation</p>
+                    </article>
+                }
+                <article class="sr-panel mt-3"><h2>הצעד הבא</h2><p>@feedback.NextStep</p></article>
+                <p class="small mt-3">המשוב נוצר בעזרת AI ועשוי לטעות. הוא אינו ציון בגרות ואינו מעריך הגייה או שטף דיבור.</p>
+            }
+            <div class="d-flex gap-3 mt-4"><a class="btn btn-primary" href="@($"/student/practice/{attempt.ExerciseId}")">תרגול נוסף</a>
+                <button class="btn btn-outline-danger" disabled="@busy" @onclick="() => confirmDelete = true">מחיקת הניסיון</button></div>
+            @if (confirmDelete)
+            {
+                <div class="alert alert-warning mt-3"><p>למחוק את ההקלטה, התמלול והמשוב מהחשבון? אי אפשר לבטל את המחיקה.</p>
+                <button class="btn btn-danger" disabled="@busy" @onclick="Delete">כן, למחוק</button>
+                <button class="btn btn-outline-secondary ms-2" @onclick="() => confirmDelete = false">ביטול</button></div>
+            }
+        }
     </div>
 </RoleArea>
-
+@code {
+    [Parameter] public int AttemptId { get; set; }
+    private AttemptSummary? attempt;
+    private string? error;
+    private bool busy, confirmDelete;
+    private CancellationTokenSource? polling;
+    protected override async Task OnParametersSetAsync()
+    {
+        polling?.Cancel(); polling?.Dispose(); polling = new();
+        attempt = null; error = null;
+        await Refresh();
+        _ = Poll(polling.Token);
+    }
+    private async Task Refresh()
+    {
+        try { attempt = await Api.GetAsync<AttemptSummary>($"api/practice/attempts/{AttemptId}"); }
+        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException) { error = "לא ניתן לטעון את הניסיון. ייתכן שהחיבור פג או שהניסיון אינו קיים."; }
+    }
+    private async Task Poll(CancellationToken token)
+    {
+        try {
+            while (!token.IsCancellationRequested)
+            {
+                await Task.Delay(4000, token);
+                if (attempt?.AnalysisStatus is not (AnalysisState.Pending or AnalysisState.Processing)) continue;
+                await InvokeAsync(async () => { await Refresh(); StateHasChanged(); });
+            }
+        } catch (OperationCanceledException) { }
+    }
+    private async Task Retry()
+    {
+        busy = true; error = null;
+        try {
+            using var response = await Api.SendAsync(HttpMethod.Post, $"api/practice/attempts/{AttemptId}/retry");
+            if (!response.IsSuccessStatusCode) error = response.StatusCode == System.Net.HttpStatusCode.TooManyRequests ? "מכסת הניתוחים היומית נוצלה." : "לא ניתן להתחיל ניתוח נוסף כרגע.";
+            await Refresh();
+        } catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException) { error = "השרת אינו זמין כרגע."; }
+        finally { busy = false; }
+    }
+    private async Task Delete()
+    {
+        busy = true;
+        try {
+            using var response = await Api.SendAsync(HttpMethod.Delete, $"api/practice/attempts/{AttemptId}");
+            if (response.IsSuccessStatusCode || response.StatusCode == System.Net.HttpStatusCode.NotFound) Navigation.NavigateTo("/student");
+            else error = "המחיקה לא הושלמה. נסו שוב.";
+        } catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException) { error = "השרת אינו זמין כרגע."; }
+        finally { busy = false; }
+    }
+    public void Dispose() { polling?.Cancel(); polling?.Dispose(); }
+}

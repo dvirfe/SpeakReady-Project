@@ -33,3 +33,6 @@ Thumbs.db
 # Local submission notes
 docs/VERIFICATION.md
 docs/VIDEO_SCRIPT.md
+# Private runtime state
+**/App_Data/
+.env.pilot
