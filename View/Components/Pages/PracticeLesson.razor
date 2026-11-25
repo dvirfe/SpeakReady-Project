@@ -1,22 +1,17 @@
-﻿@page "/student/lesson"
+@page "/student/lesson"
 <PageTitle>תרגול דיבור | SpeakReady</PageTitle>
 
 <RoleArea AllowedRole="UserRole.Student">
     <div class="sr-page container">
         <InnerHeading Eyebrow="מספרים על חוויה" Title="סיפור קטן, צעד גדול." Description="המיקוד בשיעור: זמן עבר ותשובה הכוללת סיבה ודוגמה." />
-        <p class="sr-demo-note">תרגול אחד לדוגמה לכל תחנות המסלול. אין הקלטה, שמירה או סימון השלמה.</p>
+        <p class="sr-demo-note">תרגול אחד לדוגמה לכל תחנות המסלול. אפשר להקליט ולהאזין מקומית; אין שמירה או סימון השלמה.</p>
         <div class="row g-4">
             <div class="col-lg-8">
                 <article class="sr-panel sr-question">
                     <span class="sr-badge">תרגול דיבור · כ־5 דקות</span>
                     <h2 lang="en" dir="ltr">Describe a day you enjoyed recently. What made it special?</h2>
                     <p>ספר איפה היית, מה עשית ולמה היום הזה היה מיוחד.</p>
-                    <div class="sr-recording">
-                        <span class="sr-mic" aria-hidden="true">●</span>
-                        <p>מוכנים לדבר?</p>
-                        <button class="btn btn-primary" type="button" disabled>הקלטת תשובה</button>
-                        <p class="small mt-2">ההקלטה תהיה זמינה בהמשך.</p>
-                    </div>
+                    <AudioRecorder />
                     <a class="sr-text-link mt-4 d-inline-block" href="/student/report">כך ייראה משוב לדוגמה</a>
                 </article>
             </div>
