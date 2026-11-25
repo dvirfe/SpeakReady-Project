@@ -46,8 +46,18 @@ public class UserDB(string connectionString)
         command.Parameters.AddWithValue("@name", user.FullName);
         command.Parameters.AddWithValue("@email", user.Email);
         command.Parameters.AddWithValue("@hash", BCrypt.Net.BCrypt.HashPassword(user.PasswordHash));
-        try { await command.ExecuteNonQueryAsync(); return checked((int)command.LastInsertedId); }
-        catch (MySqlException ex) when (ex.Number == 1062) { throw new DuplicateUserException(ex); }
+        try
+        {
+            await command.ExecuteNonQueryAsync();
+            int id = checked((int)command.LastInsertedId);
+            Console.WriteLine($"[Register] New user added: id {id}, role Student");
+            return id;
+        }
+        catch (MySqlException ex) when (ex.Number == 1062)
+        {
+            Console.WriteLine("[Users] Write rejected: duplicate username or email");
+            throw new DuplicateUserException(ex);
+        }
     }
 
     public Task<bool> UsernameExistsAsync(string username) =>
@@ -60,7 +70,9 @@ public class UserDB(string connectionString)
         using var connection = await OpenAsync();
         using var command = new MySqlCommand(sql, connection);
         command.Parameters.AddWithValue("@value", value);
-        return Convert.ToInt64(await command.ExecuteScalarAsync()) > 0;
+        bool exists = Convert.ToInt64(await command.ExecuteScalarAsync()) > 0;
+        Console.WriteLine($"[Users] Availability check completed: exists={exists}");
+        return exists;
     }
 
     public async Task<User?> GetUserByIdAsync(int id)
@@ -69,7 +81,9 @@ public class UserDB(string connectionString)
         using var command = new MySqlCommand(SelectUser + " WHERE UserId = @id;", connection);
         command.Parameters.AddWithValue("@id", id);
         using var reader = await command.ExecuteReaderAsync();
-        return await reader.ReadAsync() ? ReadUser(reader) : null;
+        User? user = await reader.ReadAsync() ? ReadUser(reader) : null;
+        Console.WriteLine(user is null ? $"[Users] No user with id {id}" : $"[Users] Read user by id {id}");
+        return user;
     }
 
     public async Task<List<User>> GetAllUsersAsync()
@@ -79,6 +93,7 @@ public class UserDB(string connectionString)
         using var reader = await command.ExecuteReaderAsync();
         var users = new List<User>();
         while (await reader.ReadAsync()) users.Add(ReadUser(reader));
+        Console.WriteLine($"[Users] Read {users.Count} users");
         return users;
     }
 
@@ -88,15 +103,22 @@ public class UserDB(string connectionString)
         using var command = new MySqlCommand(SelectUser + " WHERE (Username = @username OR Email = @username) AND IsActive = TRUE;", connection);
         command.Parameters.AddWithValue("@username", username);
         using var reader = await command.ExecuteReaderAsync();
-        if (!await reader.ReadAsync()) return null;
+        if (!await reader.ReadAsync())
+        {
+            // השאילתה מסננת גם חשבונות לא פעילים, לכן אין להסיק שהשם אינו קיים.
+            Console.WriteLine("[Login] Failed, user not found or inactive");
+            return null;
+        }
         var user = ReadUser(reader);
         bool isPasswordCorrect = BCrypt.Net.BCrypt.Verify(password,user.PasswordHash);
         if (isPasswordCorrect)
         {
+            Console.WriteLine($"[Login] Success: user {user.Id} ({user.RoleName})");
             return user;
         }
         else
         {
+            Console.WriteLine($"[Login] Failed, wrong password for user {user.Id}");
             return null;
         }
     }
@@ -109,6 +131,7 @@ public class UserDB(string connectionString)
         var counts = new List<RoleCount>();
         while (await reader.ReadAsync())
             counts.Add(new RoleCount(reader.GetString(0), Convert.ToInt32(reader.GetValue(1))));
+        Console.WriteLine($"[Users] Counted users across {counts.Count} roles");
         return counts;
     }
 
@@ -119,7 +142,7 @@ public class UserDB(string connectionString)
             UPDATE Users SET Role = @value,
             TeacherRequestStatus = CASE WHEN @value = 'Teacher' THEN 'Approved' ELSE 'None' END
             WHERE UserId = @id;
-            """, id, role.ToString());
+            """, id, role.ToString(), "Role update");
     }
 
     public Task<bool> UpdatePasswordAsync(int id, string password)
@@ -129,22 +152,33 @@ public class UserDB(string connectionString)
         return UpdateAsync(
             "UPDATE Users SET PasswordHash = @value WHERE UserId = @id;",
             id,
-            hashedPassword);
+            hashedPassword, "Password update");
     }
     public Task<bool> UpdateEmailAsync(int id, string email) =>
-        UpdateAsync("UPDATE Users SET Email = @value WHERE UserId = @id;", id, email);
+        UpdateAsync("UPDATE Users SET Email = @value WHERE UserId = @id;", id, email, "Email update");
 
     public Task<bool> UpdateActiveAsync(int id, bool isActive) =>
-        UpdateAsync("UPDATE Users SET IsActive = @value WHERE UserId = @id;", id, isActive);
+        UpdateAsync("UPDATE Users SET IsActive = @value WHERE UserId = @id;", id, isActive, "Active status update");
 
-    private async Task<bool> UpdateAsync(string sql, int id, object value)
+    private async Task<bool> UpdateAsync(string sql, int id, object value, string operation)
     {
         using var connection = await OpenAsync();
         using var command = new MySqlCommand(sql, connection);
         command.Parameters.AddWithValue("@id", id);
         command.Parameters.AddWithValue("@value", value);
-        try { return await command.ExecuteNonQueryAsync() > 0; }
-        catch (MySqlException ex) when (ex.Number == 1062) { throw new DuplicateUserException(ex); }
+        try
+        {
+            bool updated = await command.ExecuteNonQueryAsync() > 0;
+            Console.WriteLine(updated
+                ? $"[Users] {operation} succeeded for user {id}"
+                : $"[Users] {operation}: no affected row for user {id}");
+            return updated;
+        }
+        catch (MySqlException ex) when (ex.Number == 1062)
+        {
+            Console.WriteLine("[Users] Write rejected: duplicate username or email");
+            throw new DuplicateUserException(ex);
+        }
     }
 }
 

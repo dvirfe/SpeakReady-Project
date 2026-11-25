@@ -47,9 +47,21 @@ if (seed && string.IsNullOrEmpty(demoPassword))
         "Set Seed:DemoPassword in API User Secrets, or set Seed:Enabled=false.");
 }
 // יצירת בסיס הנתונים והטבלאות במידת הצורך.
-await DatabaseInitializer.InitializeAsync(
-    serverConnection,
-    demoPassword);
+try
+{
+    await DatabaseInitializer.InitializeAsync(serverConnection, demoPassword);
+}
+catch (MySql.Data.MySqlClient.MySqlException ex)
+{
+    Console.WriteLine($"[DB] Database connection or initialization failed (MySQL error {ex.Number}). Check server availability, credentials and permissions.");
+    throw;
+}
+catch (Exception ex)
+{
+    // לא מדפיסים מחרוזת חיבור, סיסמאות או גיבובים.
+    Console.WriteLine($"[DB] Database initialization failed ({ex.GetType().Name}). Check Schema.sql and seed configuration.");
+    throw;
+}
 // הגדרת הנתיבים של ה-API.
 app.MapOpenApi();
 app.MapControllers();
