@@ -33,3 +33,5 @@ Thumbs.db
 # Local submission notes
 docs/VERIFICATION.md
 docs/VIDEO_SCRIPT.md
+# Private runtime files from local development
+**/App_Data/

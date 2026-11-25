@@ -1,22 +1,17 @@
-﻿@page "/student/diagnostic"
+@page "/student/diagnostic"
 <PageTitle>שיעור אבחון | SpeakReady</PageTitle>
 
 <RoleArea AllowedRole="UserRole.Student">
     <div class="sr-page container">
         <InnerHeading Eyebrow="נקודת הפתיחה שלך" Title="נותנים מקום לקול שלך." Description="כמה שאלות קצרות כדי להכיר את האנגלית שלך. אין צורך להכין תשובה מושלמת." />
-        <p class="sr-demo-note">הדגמת מסך בלבד. המיקרופון אינו מופעל ולא נשלחת הקלטה לניתוח.</p>
+        <p class="sr-demo-note">אפשר להקליט ולהאזין בדפדפן. השאלות והדוח הם להדגמה; ההקלטה אינה נשלחת לניתוח.</p>
         <div class="row g-4">
             <div class="col-lg-8">
                 <article class="sr-panel sr-question">
                     <span class="sr-badge">שאלה 1 מתוך 3 · היכרות</span>
                     <h2 lang="en" dir="ltr">Tell us about something you enjoy doing in your free time.</h2>
                     <p>ספר על פעילות שאתה אוהב, למה אתה נהנה ממנה ועם מי אתה עושה אותה.</p>
-                    <div class="sr-recording">
-                        <span class="sr-mic" aria-hidden="true">●</span>
-                        <p>כאן תופיע ההקלטה שלך</p>
-                        <button type="button" class="btn btn-primary" disabled>התחלת הקלטה</button>
-                        <p class="small mt-2 mb-0">ההקלטה תהיה זמינה בשלב המימוש.</p>
-                    </div>
+                    <AudioRecorder />
                     <a class="btn btn-outline-primary mt-4" href="/student/report">צפייה בדוח לדוגמה</a>
                 </article>
             </div>
@@ -28,7 +23,7 @@
                         <li>תיאור חוויה מהעבר.</li>
                         <li>הבעת דעה עם נימוק.</li>
                     </ol>
-                    <p>בסיום יוצג משוב עם חוזקות, נקודות לשיפור והמלצה למסלול.</p>
+                    <p>אפשר לצפות בדוח לדוגמה, שאינו מבוסס על ההקלטה שלך.</p>
                     <a class="sr-text-link" href="/student">חזרה למסלול</a>
                 </aside>
             </div>

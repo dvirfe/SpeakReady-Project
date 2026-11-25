@@ -1,0 +1,48 @@
+@using Microsoft.JSInterop
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+<div class="sr-recording">
+    <span class="sr-mic" aria-hidden="true">●</span>
+    <p role="status">@(recording ? $"מקליטים · {seconds} שניות" : "הקלטת תשובה · עד שתי דקות")</p>
+    <button class="btn btn-primary" disabled="@(busy || recording || module is null)" @onclick="Start">@(preview is null ? "התחלת הקלטה" : "הקלטה מחדש")</button>
+    <button class="btn btn-outline-primary" disabled="@(!recording)" @onclick="Stop">עצירה</button>
+    @if (preview is not null) { <audio class="w-100 mt-3" src="@preview" controls aria-label="האזנה להקלטה שלך"></audio> }
+    <p class="small mt-2">ההקלטה נשארת בדפדפן בלבד. היא אינה נשלחת או נשמרת, ותימחק ביציאה מהמסך או ברענון.</p>
+    @if (error is not null) { <p class="text-danger" role="alert">@error</p> }
+</div>
+@code {
+    private readonly string id = Guid.NewGuid().ToString("N");
+    private IJSObjectReference? module;
+    private DotNetObjectReference<AudioRecorder>? reference;
+    private bool recording, busy, disposed;
+    private int seconds;
+    private string? preview, error;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        module = await JS.InvokeAsync<IJSObjectReference>("import", "./js/local-recorder.js");
+        reference = DotNetObjectReference.Create(this);
+        StateHasChanged();
+    }
+    private async Task Start()
+    {
+        if (module is null || busy) return;
+        busy = true; error = null; preview = null; seconds = 0;
+        try { await module.InvokeVoidAsync("start", id, reference, 120); if (!disposed) recording = true; }
+        catch (JSException) { error = "לא ניתן להפעיל מיקרופון. בדקו הרשאות והשתמשו בדפדפן עדכני דרך HTTPS או localhost."; }
+        finally { busy = false; }
+    }
+    private async Task Stop() { if (module is not null) await module.InvokeVoidAsync("stop", id); }
+    [JSInvokable] public Task RecordingTick(int value) { seconds = value; return InvokeAsync(StateHasChanged); }
+    [JSInvokable] public Task RecordingReady(string url, int duration) { preview = url; seconds = duration; recording = false; return InvokeAsync(StateHasChanged); }
+    [JSInvokable] public Task RecordingError(string message) { error = message; recording = false; return InvokeAsync(StateHasChanged); }
+    public async ValueTask DisposeAsync()
+    {
+        disposed = true;
+        if (module is not null) {
+            try { await module.InvokeVoidAsync("dispose", id); await module.DisposeAsync(); }
+            catch (JSDisconnectedException) { }
+        }
+        reference?.Dispose();
+    }
+}
