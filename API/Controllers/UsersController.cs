@@ -36,12 +36,22 @@ public class UsersController(UserDB users) : ControllerBase
         string username = request.Username.Trim();
         string email = request.Email.Trim();
         if (await users.UsernameExistsAsync(username))
+        {
+            Console.WriteLine("[Register] Failed, username taken");
             return Conflict(new { message = "שם המשתמש כבר תפוס." });
+        }
         if (await users.EmailExistsAsync(email))
+        {
+            Console.WriteLine("[Register] Failed, email taken");
             return Conflict(new { message = "כתובת הדואר כבר רשומה." });
+        }
         var user = new User(username, request.FullName.Trim(), email, request.Password);
         try { user.Id = await users.AddUserAsync(user); }
-        catch (DuplicateUserException) { return Conflict(new { message = "שם המשתמש או כתובת הדואר כבר רשומים." }); }
+        catch (DuplicateUserException)
+        {
+            Console.WriteLine("[Register] Failed, duplicate username or email during save");
+            return Conflict(new { message = "שם המשתמש או כתובת הדואר כבר רשומים." });
+        }
         return CreatedAtAction(nameof(GetById), new { id = user.Id }, await users.GetUserByIdAsync(user.Id));
     }
 

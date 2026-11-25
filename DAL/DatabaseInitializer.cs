@@ -18,10 +18,18 @@ public static class DatabaseInitializer
         var builder = new MySqlConnectionStringBuilder(serverConnectionString) { Database = "" };
         using (var server = new MySqlConnection(builder.ConnectionString))
         {
+            Console.WriteLine("[DB] Connecting to the MySQL server...");
             await server.OpenAsync();
+            Console.WriteLine("[DB] Connected to the server");
+            using var exists = new MySqlCommand("SELECT COUNT(*) FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME=@name", server);
+            exists.Parameters.AddWithValue("@name", DatabaseName);
+            bool alreadyExists = Convert.ToInt64(await exists.ExecuteScalarAsync()) > 0;
             using var create = new MySqlCommand(
                 "CREATE DATABASE IF NOT EXISTS SpeakReadyDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;", server);
             await create.ExecuteNonQueryAsync();
+            Console.WriteLine(alreadyExists
+                ? $"[DB] Database {DatabaseName} already exists"
+                : $"[DB] Created new database: {DatabaseName}");
         }
 
         using var connection = new MySqlConnection(GetDatabaseConnectionString(serverConnectionString));
@@ -43,18 +51,28 @@ public static class DatabaseInitializer
             await command.ExecuteNonQueryAsync();
         }
 
+        Console.WriteLine("[DB] All seven tables are ready");
+        // בפרויקט שלנו התפקידים מוגדרים ב-Enum, ולא בטבלה נפרדת.
+        Console.WriteLine("[DB] Roles defined by enum: Student, Teacher, Admin");
         if (!string.IsNullOrEmpty(demoPassword))
         {
             if (demoPassword.Length < 8)
                 throw new InvalidOperationException("Seed:DemoPassword must have at least 8 characters.");
             await SeedUsersAsync(connection, demoPassword);
         }
+        else Console.WriteLine("[DB] Demo user creation is disabled");
+        Console.WriteLine("[DB] Initialization finished, the server is ready for requests");
     }
 
     private static async Task SeedUsersAsync(MySqlConnection connection, string demoPassword)
     {
         using var count = new MySqlCommand("SELECT COUNT(*) FROM Users;", connection);
-        if (Convert.ToInt64(await count.ExecuteScalarAsync()) != 0) return;
+        long total = Convert.ToInt64(await count.ExecuteScalarAsync());
+        if (total != 0)
+        {
+            Console.WriteLine($"[DB] Users table already has {total} users, no seed users added");
+            return;
+        }
 
         using var transaction = connection.BeginTransaction();
         for (int index = 0; index < 10; index++)
@@ -93,6 +111,7 @@ public static class DatabaseInitializer
             await command.ExecuteNonQueryAsync();
         }
         transaction.Commit();
+        Console.WriteLine("[DB] Added 10 demo users");
     }
 }
 
